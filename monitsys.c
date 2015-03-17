@@ -1,10 +1,11 @@
 /*
- */
+*/
 
 #include <p18f452.h>  /* for the special function register declarations */
 #include <timers.h>
 #include <xlcd.h>
 #include <delays.h>
+#include <ADC.h>
 
 long time;
 
@@ -84,12 +85,33 @@ void timeToString(long time_sec, char * time_hms)
 	//time_hms[8] = 0;
 }
 
+void ADCtoString(int raw, char *lumus)
+{
+	char i;
+
+	lumus[3] = raw%10 + '0';
+	raw /= 10;
+	lumus[2] = raw%10 + '0';
+	raw /= 10;
+	lumus[1] = raw%10 + '0';
+	raw /= 10;
+	lumus[0] = raw%10 + '0';	// note: tirar este %
+	lumus[4] = 0;
+}
+
+
 /* main */
 
 void main (void) 
 {
 	char buf[9];	/* LCD buffer */
+	char lumus[5];	/* luminosity buffer (ADC) */
+	long int count;
+	int adc_result;
 
+	OpenADC(ADC_FOSC_32 & ADC_RIGHT_JUST, ADC_CH0 & ADC_INT_OFF);
+	ADCON1 =0x00;
+	SetChanADC(ADC_CH0);
 	/* timer */
 
 	OpenTimer1( TIMER_INT_ON   &
@@ -122,7 +144,12 @@ void main (void)
 		timeToString(time, buf);
 		putsXLCD(buf);             // data memory
 		while( BusyXLCD() );
+
 		SetDDRamAddr(0x40);        // Second line; first column
-		putrsXLCD("Hello World!"); // program memory 
+		ConvertADC();	//perform ADC conversion
+		while(BusyADC());	//wait for result
+		adc_result = ReadADC() >> 6;	//get ADC result
+		ADCtoString(adc_result, lumus);
+		putsXLCD(lumus);
 	}
 }
