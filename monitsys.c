@@ -109,6 +109,7 @@ void main (void)
 	long int count;
 	int adc_result;
 
+	/* We're missing a flag on OpenADC function - check page 11 ( should be ADC_8ANA_0REF)*/
 	OpenADC(ADC_FOSC_32 & ADC_RIGHT_JUST, ADC_CH0 & ADC_INT_OFF);
 	ADCON1 =0x00;
 	SetChanADC(ADC_CH0);
