@@ -88,15 +88,10 @@ void timeToString(long time_sec, char * time_hms)
 void ADCtoString(int raw, char *lumus)
 {
 	char i;
-
-	lumus[3] = raw%10 + '0';
-	raw /= 10;
-	lumus[2] = raw%10 + '0';
-	raw /= 10;
 	lumus[1] = raw%10 + '0';
 	raw /= 10;
 	lumus[0] = raw%10 + '0';	// note: tirar este %
-	lumus[4] = 0;
+	lumus[2] = 0;
 }
 
 
@@ -105,7 +100,7 @@ void ADCtoString(int raw, char *lumus)
 void main (void) 
 {
 	char buf[9];	/* LCD buffer */
-	char lumus[5];	/* luminosity buffer (ADC) */
+	char lumus[3];	/* luminosity buffer (ADC) */
 	long int count;
 	int adc_result;
 
@@ -143,14 +138,34 @@ void main (void)
 		SetDDRamAddr(0x00);        // First line, first column
 		//putsXLCD(buf);             // data memory
 		timeToString(time, buf);
-		putsXLCD(buf);             // data memory
-		while( BusyXLCD() );
+		putsXLCD(buf);             // data memory		
+		
+		SetDDRamAddr(0x0d);
+		putrsXLCD("ATL");
 
-		SetDDRamAddr(0x40);        // Second line; first column
+		SetDDRamAddr(0x11);
+		putrsXLCD("a");
+
+		SetDDRamAddr(0x13);
+		putrsXLCD("P");
+
+		SetDDRamAddr(0x47);
+		while( BusyXLCD() );
+		putrsXLCD("M");
+
+		SetDDRamAddr(0x50);		
+		putrsXLCD("L ");
+
+		SetDDRamAddr(0x52);        // Second line; first column
 		ConvertADC();	//perform ADC conversion
 		while(BusyADC());	//wait for result
 		adc_result = ReadADC() >> 6;	//get ADC result
-		ADCtoString(adc_result, lumus);
+		ADCtoString(adc_result/100, lumus);
 		putsXLCD(lumus);
+
+		SetDDRamAddr(0x40);
+		putrsXLCD("20 C");
+		//putrsXLCD(" 20");
+		
 	}
 }
