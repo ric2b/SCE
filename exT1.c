@@ -15,6 +15,8 @@ typedef struct time
 } time;
 
 time clock;
+char temperature_treshold = 99;
+char lumos_treshold = 10;
 char updateLCD = 1;
 char changeConfigMode = 0;
 
@@ -47,15 +49,15 @@ void t1_isr (void)
 	WriteTimer1( 0x8000 );       // reload timer: 1 second : 0x8000
 	
 	clock.seconds++;
-	if(clock.seconds == 60)
+	if(clock.seconds >= 60)
 	{
 		clock.seconds=0;
 		clock.minutes++;
-		if(clock.minutes == 60)
+		if(clock.minutes >= 60)
 		{
 			clock.minutes=0;
 			clock.hours++;
-			if (clock.hours == 24)
+			if (clock.hours >= 24)
 			{
 				clock.hours = 0;
 			}
@@ -119,10 +121,10 @@ void timeToString(char * time_hms)
 
 	time_hms[7] = s%10 + '0';
 	time_hms[6] = s/10 + '0';
-	time_hms[5] = ':';
+	//time_hms[5] = ':';
 	time_hms[4] = m%10 + '0';
 	time_hms[3] = m/10 + '0';
-	time_hms[2] = ':';
+	//time_hms[2] = ':';
 	time_hms[1] = h%10 + '0';
 	time_hms[0] = h/10 + '0';
 	//time_hms[8] = 0;
@@ -146,31 +148,42 @@ char * readTemperature(char * temperature)
 	temperature[4] = 0; 
 	return temperature;
 }
+
+void changeValueWithS1(char * value)
+{
+	// meter aqui stuff sobre o S1
+	*value ++;
+	return;
+}
+
 void config()
 {
 	switch(changeConfigMode)
 	{
 		case 1:
-			
+			changeValueWithS1(&clock.hours);
 			break;
 		case 2:
-
+			changeValueWithS1(&clock.minutes);
 			break;
 		case 3:
-
+			changeValueWithS1(&clock.seconds);
 			break;
 		case 4:
-
+			changeValueWithS1(&temperature_treshold);
+			if(temperature_treshold == 100) 
+				temperature_treshold = 0;
 			break;
 		case 5:
-
+			changeValueWithS1(&lumos_treshold);
+			if(lumos_treshold == 11) 
+				lumos_treshold = 0;
 			break;
 		case 6:
 			changeConfigMode = 0;
 			break; 
 	}
-
-
+	updateLCD = 1;
 }
 
 /* main */
