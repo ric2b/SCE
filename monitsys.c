@@ -72,8 +72,7 @@ void t1_isr (void)
 #pragma interrupt S3_isr
 void S3_isr (void) 
 {
-	//INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
-	PIR1bits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
+	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
 	changeConfigMode++;
 }
 
