@@ -17,11 +17,12 @@ typedef struct time
 	char hours;
 } time;
 
-time clock;
+volatile time clock;
 char temperature_treshold = 99;
 char lumos_treshold = 10;
 char updateLCD = 1;
 volatile char changeConfigMode = 0;
+volatile char configModeUpdated = 0;
 
 void t1_isr (void);  /* prototype needed for 'goto' below */
 void S3_isr (void);  /* prototype needed for 'goto' below */
@@ -70,6 +71,7 @@ void S3_isr (void)
 {
 	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
 	changeConfigMode++;
+	configModeUpdated = 1;
 }
 
 void EnableHighInterrupts (void)
@@ -155,6 +157,7 @@ void changeValueWithS1(char * value)
 
 void config()
 {
+	configModeUpdated = 0; // reset the variable
 	switch(changeConfigMode)
 	{
 		case 1:
@@ -225,7 +228,7 @@ void main (void)
 	buf[2] = ':';
 
 	while(1) {
-		if(changeConfigMode)
+		if(configModeUpdated)
 		{
 			config();
 		}
