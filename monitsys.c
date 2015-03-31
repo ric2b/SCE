@@ -8,9 +8,17 @@
 #include <ADC.h>
 #include <portb.h>
 
-#define MS_NOPS 40
-
 #define debug
+
+#ifndef debug
+#define F_CPU 4000	// in kHz
+#else
+#define F_CPU 1000	// in kHz. used when in debug mode
+#endif
+
+#define PMON 5
+#define TSOM 2
+#define NREG 30
 
 typedef struct time
 {
@@ -92,12 +100,13 @@ void EnableHighInterrupts (void)
 
 void delayms(short millis)
 {
-	short i;
-	short j;
+	short i, j;
 	for(i = 0; i < millis; i++)
 	{
-		for(j = 0; j < MS_NOPS; j++)
-			Nop();
+		for(j = 0; j < F_CPU/100; j++)
+		{	// 98 nops, not 100
+			Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();
+		}
 	}
 }
 
@@ -169,9 +178,8 @@ char * readTemperature(char * temperature)
 	return temperature;
 }
 
-void changeValueWithS1(char * value)
+void changeValueWithS2(char * value)
 {
-	// meter aqui stuff sobre o S1
 	if(PORTAbits.RA4 == 0)
 	{
 PORTBbits.RB3 = 1;
@@ -191,38 +199,33 @@ void config()
 {
 	TRISBbits.TRISB2 = 0;
 	TRISBbits.TRISB3 = 0;
-PORTBbits.RB2 = 1;
-PORTBbits.RB3 = 0;
+	PORTBbits.RB2 = 1;
+	PORTBbits.RB3 = 0;
 	switch(configMode)
 	{		
 		case 1:
-			changeValueWithS1(&clock.hours);
-			if(clock.hours >= 24)
-				clock.hours=0;
+			changeValueWithS2(&clock.hours);
+			clock.hours %= 24;
 			break;
 		case 2:
-			changeValueWithS1(&clock.minutes);
-			if(clock.minutes >= 60)
-				clock.minutes=0;
+			changeValueWithS2(&clock.minutes);
+			clock.minutes %= 60;
 			break;
 		case 3:
-			changeValueWithS1(&clock.seconds);
-			if(clock.seconds >= 60)
-				clock.seconds=0;
+			changeValueWithS2(&clock.seconds);
+			clock.seconds %= 60;
 			break;
 		case 4:
-			changeValueWithS1(&temperature_treshold);
-			if(temperature_treshold >= 100) 
-				temperature_treshold = 0;
+			changeValueWithS2(&temperature_treshold);
+			temperature_treshold %= 100;
 			break;
 		case 5:
-			changeValueWithS1(&lumos_treshold);
-			if(lumos_treshold >= 11) 
-				lumos_treshold = 0;
+			changeValueWithS2(&lumos_treshold);
+			lumos_treshold %= 11;
 			break;
 		case 6:
 			configMode = 0;
-	configModeUpdated = 0; // reset the variable
+			configModeUpdated = 0; // reset the variable
 			break; 
 	}
 	updateLCD = 1;
@@ -244,10 +247,9 @@ void main (void)
 	clock.hours   = 0;
 
 	/* ADC init */
-	TRISB |= 0b00000001;
 	OpenADC(ADC_FOSC_32 & ADC_RIGHT_JUST & ADC_8ANA_0REF, ADC_CH0 & ADC_INT_OFF);
 
-	/* S2 (RA4) is output) */
+	/* S2 (RA4) is output */
 	TRISAbits.TRISA4 = 1;
 
 	/* timer */
@@ -259,6 +261,7 @@ void main (void)
 			T1_SYNC_EXT_ON );
 
 	/* enable external interrupt on pin RB0/INT0 */
+	TRISBbits.TRISB0 = 1;
 	OpenRB0INT(PORTB_CHANGE_INT_ON & FALLING_EDGE_INT & PORTB_PULLUPS_OFF);
 
 	EnableHighInterrupts();
