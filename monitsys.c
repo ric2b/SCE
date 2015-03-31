@@ -8,6 +8,8 @@
 #include <ADC.h>
 #include <portb.h>
 
+#define MS_NOPS 40
+
 #define debug
 
 typedef struct time
@@ -21,17 +23,27 @@ volatile time clock;
 char temperature_treshold = 99;
 char lumos_treshold = 10;
 char updateLCD = 1;
-volatile char changeConfigMode = 0;
+volatile char configMode = 0;
 volatile char configModeUpdated = 0;
 
-void t1_isr (void);  /* prototype needed for 'goto' below */
-void S3_isr (void);  /* prototype needed for 'goto' below */
+void chooseInterrupt (void);  /* prototype needed for 'goto' below */
+void S3_isr (void);
+void t1_isr (void);
+void config();
+
 /*
  * For high interrupts, control is transferred to address 0x8.
  */
 #pragma code HIGH_INTERRUPT_VECTOR = 0x8
-
 void high_ISR (void) 
+{
+	_asm
+		goto chooseInterrupt
+	_endasm
+}
+
+#pragma interrupt chooseInterrupt
+void chooseInterrupt(void)
 {
 	if(PIR1bits.TMR1IF)
 		t1_isr();
@@ -41,7 +53,6 @@ void high_ISR (void)
 
 #pragma code  /* allow the linker to locate the remaining code */
 
-#pragma interrupt t1_isr
 void t1_isr (void) 
 {
 	WriteTimer1( 0x8000 );       // reload timer: 1 second : 0x8000
@@ -66,11 +77,10 @@ void t1_isr (void)
 	updateLCD = 1;
 }
 
-#pragma interrupt S3_isr
 void S3_isr (void) 
 {
 	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
-	changeConfigMode++;
+	configMode++;
 	configModeUpdated = 1;
 }
 
@@ -78,6 +88,17 @@ void EnableHighInterrupts (void)
 {
 	RCONbits.IPEN = 1;	/* The IPEN bit in the RCON register enables priority levels for interrupts. If clear, all priorities are set to high. */
 	INTCONbits.GIEH = 1;  /* Enables all un-masked high interrupts */
+}
+
+void delayms(short millis)
+{
+	short i;
+	short j;
+	for(i = 0; i < millis; i++)
+	{
+		for(j = 0; j < MS_NOPS; j++)
+			Nop();
+	}
 }
 
 /* LCD */
@@ -151,36 +172,57 @@ char * readTemperature(char * temperature)
 void changeValueWithS1(char * value)
 {
 	// meter aqui stuff sobre o S1
-	*value ++;
+	if(PORTAbits.RA4 == 0)
+	{
+PORTBbits.RB3 = 1;
+		(*value)++;
+		delayms(500);
+		while(PORTAbits.RA4 == 0)
+		{
+			delayms(100);
+			(*value)++;
+		}
+	}	
+PORTBbits.RB3 = 0;
 	return;
 }
 
 void config()
 {
-	configModeUpdated = 0; // reset the variable
-	switch(changeConfigMode)
-	{
+	TRISBbits.TRISB2 = 0;
+	TRISBbits.TRISB3 = 0;
+PORTBbits.RB2 = 1;
+PORTBbits.RB3 = 0;
+	switch(configMode)
+	{		
 		case 1:
 			changeValueWithS1(&clock.hours);
+			if(clock.hours >= 24)
+				clock.hours=0;
 			break;
 		case 2:
 			changeValueWithS1(&clock.minutes);
+			if(clock.minutes >= 60)
+				clock.minutes=0;
 			break;
 		case 3:
 			changeValueWithS1(&clock.seconds);
+			if(clock.seconds >= 60)
+				clock.seconds=0;
 			break;
 		case 4:
 			changeValueWithS1(&temperature_treshold);
-			if(temperature_treshold == 100) 
+			if(temperature_treshold >= 100) 
 				temperature_treshold = 0;
 			break;
 		case 5:
 			changeValueWithS1(&lumos_treshold);
-			if(lumos_treshold == 11) 
+			if(lumos_treshold >= 11) 
 				lumos_treshold = 0;
 			break;
 		case 6:
-			changeConfigMode = 0;
+			configMode = 0;
+	configModeUpdated = 0; // reset the variable
 			break; 
 	}
 	updateLCD = 1;
@@ -190,7 +232,7 @@ void config()
 
 void main (void) 
 {
-	char buf[9];	/* LCD buffer */
+	char time_buf[9];	/* LCD buffer */
 	char lumus[3];	/* luminosity buffer (ADC) */
 	char temperature[5];
 	char S2, S3 = 0;
@@ -202,7 +244,11 @@ void main (void)
 	clock.hours   = 0;
 
 	/* ADC init */
+	TRISB |= 0b00000001;
 	OpenADC(ADC_FOSC_32 & ADC_RIGHT_JUST & ADC_8ANA_0REF, ADC_CH0 & ADC_INT_OFF);
+
+	/* S2 (RA4) is output) */
+	TRISAbits.TRISA4 = 1;
 
 	/* timer */
 	OpenTimer1( TIMER_INT_ON   &
@@ -223,9 +269,9 @@ void main (void)
 
 	ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
 	OpenXLCD( FOUR_BIT & LINES_5X7 ); // 4-bit data interface; 2 x 16 characters
-	buf[8] = 0;  
-	buf[5] = ':';
-	buf[2] = ':';
+	time_buf[8] = 0;  
+	time_buf[5] = ':';
+	time_buf[2] = ':';
 
 	while(1) {
 		if(configModeUpdated)
@@ -240,18 +286,18 @@ void main (void)
 			WriteCmdXLCD( CURSOR_OFF );// Enable display with no cursor
 			while( BusyXLCD() );
 			SetDDRamAddr(0x00);        // First line, first column
-			//putsXLCD(buf);             // data memory
-			timeToString(buf);
-			putsXLCD(buf);             // data memory		
+			//putsXLCD(time_buf);             // data memory
+			timeToString(time_buf);
+			putsXLCD(time_buf);             // data memory		
 
 			SetDDRamAddr(0x09);
 			putrsXLCD("ATL");
 
 			SetDDRamAddr(0x0d);
-			putrsXLCD("a");
+			putcXLCD('a');
 
 			SetDDRamAddr(0x0f);
-			putrsXLCD("P");
+			putcXLCD('P');
 
 			putcXLCD('#');
 
@@ -260,16 +306,16 @@ void main (void)
 			putsXLCD(readTemperature(temperature));
 
 			SetDDRamAddr(0x47);
-			putrsXLCD("M");
+			putcXLCD('M');
 
 #ifdef debug
 			SetDDRamAddr(0x49);
-			if(changeConfigMode)
-				putrsXLCD("M");
+			if(configMode)
+				putcXLCD('M');
 #endif
 
 			SetDDRamAddr(0x4c);		
-			putrsXLCD("L");
+			putcXLCD('L');
 
 			SetDDRamAddr(0x4e);        // Second line; first column
 			ConvertADC();	//perform ADC conversion
@@ -280,9 +326,6 @@ void main (void)
 
 			SetDDRamAddr(0x50);
 			putcXLCD('#');
-			putcXLCD(' ');
-			putcXLCD(S2+'0');		
-			putcXLCD(S3+'0');
 
 			updateLCD = 0;
 		}
