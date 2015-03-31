@@ -29,19 +29,15 @@ void S3_isr (void);  /* prototype needed for 'goto' below */
  * For high interrupts, control is transferred to address 0x8.
  */
 #pragma code HIGH_INTERRUPT_VECTOR = 0x8
+
 void high_ISR (void) 
 {
-	_asm
-		goto t1_isr
-	_endasm
+	if(PIR1bits.TMR1IF)
+		t1_isr();
+	if(INTCONbits.INT0IF)
+		S3_isr();
 }
 
-void high_ISR_S3 (void) 
-{
-	_asm
-		goto S3_isr
-	_endasm
-}
 #pragma code  /* allow the linker to locate the remaining code */
 
 #pragma interrupt t1_isr
