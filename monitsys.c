@@ -47,6 +47,7 @@ volatile char update_lumus = 1;
 void chooseInterrupt (void);  /* prototype needed for 'goto' below */
 void S3_isr (void);
 void t1_isr (void);
+void t3_isr (void);
 void config();
 
 /*
@@ -65,13 +66,15 @@ void chooseInterrupt(void)
 {
 	if(PIR1bits.TMR1IF)
 		t1_isr();
+	if(PIR2bits.TMR3IF)
+		t3_isr();
 	if(INTCONbits.INT0IF)
 		S3_isr();
 }
 
 #pragma code  /* allow the linker to locate the remaining code */
 
-void t1_isr (void) 
+void t1_isr (void)
 {
 	WriteTimer1(0x8000);       // reload timer: 1 second : 0x8000
 	
@@ -95,7 +98,13 @@ void t1_isr (void)
 	} 
 	 
 	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
-	updateLCD = 1;
+}
+
+void t3_isr (void)
+{
+	WriteTimer3(0x10000 - (0x8000/8)*PMON);       // reload timer: 1 second : 0x8000
+	PIR2bits.TMR3IF = 0;         // clear flag to avoid another interrupt
+	update_temp = update_lumus = 1;
 }
 
 void S3_isr (void) 
@@ -228,7 +237,6 @@ void config()
 void main (void) 
 {
 	char time_buf[3];	/* LCD buffer */
-	char lumus[3];	/* luminosity buffer (ADC) */
 	char temperature[3];
 	char S2, S3 = 0;
 	long int count;
@@ -245,12 +253,18 @@ void main (void)
 	TRISAbits.TRISA4 = 1;
 
 	/* timer */
-	OpenTimer1( TIMER_INT_ON   &
+	OpenTimer1(TIMER_INT_ON   &
 			T1_16BIT_RW    &
 			T1_SOURCE_EXT  &
 			T1_PS_1_1      &
 			T1_OSC1EN_ON   &
 			T1_SYNC_EXT_ON );
+
+	OpenTimer3(TIMER_INT_ON   &
+			T3_16BIT_RW    &
+			T3_SOURCE_EXT  &	// to use TMR1 as input this must be set to EXT
+			T3_PS_1_8      &
+			T3_SYNC_EXT_ON );
 
 	/* enable external interrupt on pin RB0/INT0 */
 	TRISBbits.TRISB0 = 1;
@@ -259,6 +273,7 @@ void main (void)
 	EnableHighInterrupts();
 
 	WriteTimer1(0x8000); // load timer: 1 second
+	WriteTimer3(0x10000 - (0x8000/8)*PMON); // load timer: 1 second
 
 	/* LCD */
 	ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
@@ -282,7 +297,7 @@ void main (void)
 	putcXLCD('C');
 
 	while(BusyXLCD());
-	SetDDRamAddr(0x4c);
+	SetDDRamAddr(0x4d);
 	putcXLCD('L');
 
 	while(1)
@@ -369,12 +384,11 @@ void main (void)
 		if(update_lumus)
 		{
 			update_lumus = 0;
-			SetDDRamAddr(0x4e);	// Second line; first column
+			SetDDRamAddr(0x4f);	// Second line; first column
 			ConvertADC();	//perform ADC conversion
 			while(BusyADC());	//wait for result
 			adc_result = ReadADC() >> 6;	//get ADC result
-			int_to_str(adc_result/100, lumus);
-			putsXLCD(lumus);
+			putcXLCD(adc_result/204+'0');	// will be on [0,5]
 		}
 
 	}
