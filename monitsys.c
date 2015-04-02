@@ -31,8 +31,18 @@ volatile time clock;
 char temperature_treshold = 99;
 char lumos_treshold = 10;
 char updateLCD = 1;
+// these variables are changed by ISRs
 volatile char configMode = 0;
 volatile char configModeUpdated = 0;
+volatile char update_hours = 1;
+volatile char update_minutes = 1;
+volatile char update_seconds = 1;
+volatile char update_alt = 1;
+volatile char update_a = 1;
+volatile char update_P = 1;
+volatile char update_temp = 1;
+volatile char update_M = 1;
+volatile char update_lumus = 1;
 
 void chooseInterrupt (void);  /* prototype needed for 'goto' below */
 void S3_isr (void);
@@ -63,17 +73,20 @@ void chooseInterrupt(void)
 
 void t1_isr (void) 
 {
-	WriteTimer1( 0x8000 );       // reload timer: 1 second : 0x8000
+	WriteTimer1(0x8000);       // reload timer: 1 second : 0x8000
 	
 	clock.seconds++;
+	update_seconds = 1;
 	if(clock.seconds >= 60)
 	{
 		clock.seconds=0;
 		clock.minutes++;
+		update_minutes = 1;
 		if(clock.minutes >= 60)
 		{
 			clock.minutes=0;
 			clock.hours++;
+			update_hours = 1;
 			if (clock.hours >= 24)
 			{
 				clock.hours = 0;
@@ -140,41 +153,20 @@ void DelayXLCD( void )
 	return;
 }
 
-void timeToString(char * time_hms)
+char * int_to_str(int raw, char *str)
 {
-	unsigned short h, m, s;
-
-	h = clock.hours;
-	m = clock.minutes;
-	s = clock.seconds;
-
-	time_hms[7] = s%10 + '0';
-	time_hms[6] = s/10 + '0';
-	//time_hms[5] = ':';
-	time_hms[4] = m%10 + '0';
-	time_hms[3] = m/10 + '0';
-	//time_hms[2] = ':';
-	time_hms[1] = h%10 + '0';
-	time_hms[0] = h/10 + '0';
-	//time_hms[8] = 0;
-}
-
-void ADCtoString(int raw, char *lumus)
-{
-	char i;
-	lumus[1] = raw%10 + '0';
+	str[1] = raw%10 + '0';
 	raw /= 10;
-	lumus[0] = raw%10 + '0';	// note: tirar este %
-	lumus[2] = 0;
+	str[0] = raw + '0';
+	str[2] = 0;
+	return str;
 }
 
 char * readTemperature(char * temperature)
 {
 	temperature[0] = '2';
 	temperature[1] = '1';
-	temperature[2] = ' ';
-	temperature[3] = 'C';
-	temperature[4] = 0; 
+	temperature[2] = 0;
 	return temperature;
 }
 
@@ -235,9 +227,9 @@ void config()
 
 void main (void) 
 {
-	char time_buf[9];	/* LCD buffer */
+	char time_buf[3];	/* LCD buffer */
 	char lumus[3];	/* luminosity buffer (ADC) */
-	char temperature[5];
+	char temperature[3];
 	char S2, S3 = 0;
 	long int count;
 	int adc_result;
@@ -269,68 +261,120 @@ void main (void)
 	WriteTimer1(0x8000); // load timer: 1 second
 
 	/* LCD */
-
 	ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
 	OpenXLCD( FOUR_BIT & LINES_5X7 ); // 4-bit data interface; 2 x 16 characters
-	time_buf[8] = 0;  
-	time_buf[5] = ':';
-	time_buf[2] = ':';
 
-	while(1) {
+	while(BusyXLCD());
+	WriteCmdXLCD(DOFF);	// Turn display off
+	while(BusyXLCD());
+	WriteCmdXLCD(CURSOR_OFF);	// Enable display with no cursor
+
+	while(BusyXLCD());
+	SetDDRamAddr(0x02);
+	putcXLCD(':');
+
+	while(BusyXLCD());
+	SetDDRamAddr(0x05);
+	putcXLCD(':');
+
+	while(BusyXLCD());
+	SetDDRamAddr(0x43);
+	putcXLCD('C');
+
+	while(BusyXLCD());
+	SetDDRamAddr(0x4c);
+	putcXLCD('L');
+
+	while(1)
+	{
 		if(configModeUpdated)
 		{
 			config();
 		}
-		if(updateLCD)
-		{
-			while( BusyXLCD() );
-			WriteCmdXLCD( DOFF );      // Turn display off
-			while( BusyXLCD() );
-			WriteCmdXLCD( CURSOR_OFF );// Enable display with no cursor
-			while( BusyXLCD() );
-			SetDDRamAddr(0x00);        // First line, first column
-			//putsXLCD(time_buf);             // data memory
-			timeToString(time_buf);
-			putsXLCD(time_buf);             // data memory		
 
+		if(update_seconds)
+		{
+			update_seconds = 0;
+			while(BusyXLCD());
+			SetDDRamAddr(0x06);    // First line, first column
+			int_to_str(clock.seconds, time_buf);
+			putsXLCD(time_buf);    // data memory
+
+			if(update_minutes)
+			{
+				update_minutes = 0;
+				while(BusyXLCD());
+				SetDDRamAddr(0x03);    // First line, first column
+				int_to_str(clock.minutes, time_buf);
+				putsXLCD(time_buf);    // data memory
+
+				if(update_hours)
+				{
+					update_hours = 0;
+					while(BusyXLCD());
+					SetDDRamAddr(0x00);    // First line, first column
+					int_to_str(clock.hours, time_buf);
+					putsXLCD(time_buf);    // data memory
+
+				}
+			}
+		}
+
+		if(update_alt)
+		{
+			update_alt = 0;
 			SetDDRamAddr(0x09);
 			putrsXLCD("ATL");
+		}
 
+		if(update_a)
+		{
+			update_a = 0;
 			SetDDRamAddr(0x0d);
 			putcXLCD('a');
+		}
 
+		if(update_P)
+		{
+			update_P = 0;
 			SetDDRamAddr(0x0f);
 			putcXLCD('P');
+		}
 
-			putcXLCD('#');
-
+		if(update_temp)
+		{
+			update_temp = 0;
+			while(BusyXLCD());
 			SetDDRamAddr(0x40);
-			while( BusyXLCD() );
 			putsXLCD(readTemperature(temperature));
+		}
 
+		if(update_M)
+		{
+			update_M = 0;
+			while(BusyXLCD());
 			SetDDRamAddr(0x47);
 			putcXLCD('M');
+		}
 
 #ifdef debug
+		if(configMode)
+		{
+			while(BusyXLCD());
 			SetDDRamAddr(0x49);
-			if(configMode)
-				putcXLCD('M');
+			putcXLCD('M');
+		}
 #endif
 
-			SetDDRamAddr(0x4c);		
-			putcXLCD('L');
-
-			SetDDRamAddr(0x4e);        // Second line; first column
+		if(update_lumus)
+		{
+			update_lumus = 0;
+			SetDDRamAddr(0x4e);	// Second line; first column
 			ConvertADC();	//perform ADC conversion
 			while(BusyADC());	//wait for result
 			adc_result = ReadADC() >> 6;	//get ADC result
-			ADCtoString(adc_result/100, lumus);
+			int_to_str(adc_result/100, lumus);
 			putsXLCD(lumus);
-
-			SetDDRamAddr(0x50);
-			putcXLCD('#');
-
-			updateLCD = 0;
 		}
 
 	}
