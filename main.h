@@ -7,6 +7,7 @@
 #include <delays.h>
 #include <ADC.h>
 #include <portb.h>
+#include <i2c.h>
 
 /* ----------- DEFINES ---------------*/
 #define debug
