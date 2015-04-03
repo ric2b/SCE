@@ -7,6 +7,7 @@
 #include <delays.h>
 #include <ADC.h>
 #include <portb.h>
+#include <i2c.h>
 
 #define debug
 
@@ -19,6 +20,11 @@
 #define PMON 5
 #define TSOM 2
 #define NREG 30
+
+#define TC74ADDR (0b10011011) // Address and READ command
+#define TC74ADDW (0b10011010)  // Address and WRITE command
+#define RTR (0x00)    // TC74 command - read temperature
+#define RWCR (0x01)    // TC74 command - read/write (config)
 
 typedef struct time
 {
@@ -55,7 +61,7 @@ void config();
  * For high interrupts, control is transferred to address 0x8.
  */
 #pragma code HIGH_INTERRUPT_VECTOR = 0x8
-void high_ISR (void) 
+void high_ISR (void)
 {
 	_asm
 		goto chooseInterrupt
@@ -78,7 +84,7 @@ void chooseInterrupt(void)
 void t1_isr (void)
 {
 	WriteTimer1(0x8000);       // reload timer: 1 second : 0x8000
-	
+
 	clock.seconds++;
 	update_seconds = 1;
 	if(clock.seconds >= 60)
@@ -96,8 +102,8 @@ void t1_isr (void)
 				clock.hours = 0;
 			}
 		}
-	} 
-	 
+	}
+
 	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
 }
 
@@ -108,7 +114,7 @@ void t3_isr (void)
 	update_temp = update_lumus = 1;
 }
 
-void S3_isr (void) 
+void S3_isr (void)
 {
 	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
 	configMode++;
@@ -171,12 +177,46 @@ void int_to_str(int raw, char *str)
 	str[2] = 0;
 }
 
-char * readTemperature(char * temperature)
+void readTemperature(char * temperature)
 {
-	temperature[0] = '2';
-	temperature[1] = '1';
-	temperature[2] = 0;
-	return temperature;
+	char value;
+	do{
+		IdleI2C();
+		StartI2C(); IdleI2C();
+		WriteI2C(TC74ADDW); IdleI2C(); // slave address + write
+		WriteI2C(RWCR); IdleI2C(); // Enable Read Write Config
+		RestartI2C(); IdleI2C(); // ?????
+
+		WriteI2C(TC74ADDR); IdleI2C(); // slave address + read
+		value = ReadI2C(); IdleI2C(); // Read from slave
+		NotAckI2C(); IdleI2C(); // No ACK from master means end of transmission
+		StopI2C(); IdleI2C();
+	} while (!(value & 0x40)); // ?????
+
+	IdleI2C();
+	StartI2C(); IdleI2C();
+	WriteI2C(TC74ADDW); IdleI2C(); // slave address + write
+	WriteI2C(RTR); IdleI2C(); // Enable Read Write Config
+	RestartI2C(); IdleI2C(); // ?????
+
+	WriteI2C(TC74ADDR); IdleI2C(); // slave address + read
+	value = ReadI2C(); IdleI2C(); // Read from slave
+	NotAckI2C(); IdleI2C(); // No ACK from master means end of transmission
+	StopI2C(); IdleI2C();
+
+	if(value>=0)
+	{
+		temperature[0] = value/10 + '0';
+		temperature[1] = value%10 + '0';
+	}
+	else
+	{
+		temperature[0] = 'N';
+		temperature[1] = 'E';
+	}
+
+
+	return;
 }
 
 void changeValueWithS2(char * value)
@@ -191,7 +231,7 @@ PORTBbits.RB3 = 1;
 			delayms(100);
 			(*value)++;
 		}
-	}	
+	}
 PORTBbits.RB3 = 0;
 	return;
 }
@@ -209,7 +249,7 @@ void config()
 	while(BusyXLCD());
 
 	switch(configMode)
-	{		
+	{
 		case 1:
 			changeValueWithS2(&alarm.hours);
 			alarm.hours %= 24;
@@ -243,14 +283,14 @@ void config()
 			configMode = 0;
 			configModeUpdated = 0; // reset the variable
 			update_seconds = update_minutes = update_hours = 1;
-			break; 
+			break;
 	}
 	updateLCD = 1;
 }
 
 /* main */
 
-void main (void) 
+void main (void)
 {
 	char time_buf[3];	/* LCD buffer */
 	char temperature[3];
@@ -293,6 +333,12 @@ void main (void)
 
 	WriteTimer1(0x8000); // load timer: 1 second
 	WriteTimer3(0x10000 - (0x8000/8)*PMON); // load timer: 1 second
+
+	/* I2C */
+	TRISC = 0b00011000; // I2C pins
+	SSPADD = 0b00000111;    // Set baud rate
+	temperature[2] = 0;
+	OpenI2C(MASTER, SLEW_OFF);
 
 	/* LCD */
 	ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
@@ -380,7 +426,8 @@ void main (void)
 			update_temp = 0;
 			while(BusyXLCD());
 			SetDDRamAddr(0x40);
-			putsXLCD(readTemperature(temperature));
+			readTemperature(temperature);
+			putsXLCD(temperature);
 		}
 
 		if(update_M)
