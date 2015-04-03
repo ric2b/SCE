@@ -1,5 +1,14 @@
 #include "interrupts.h"
 
+// For high interrupts, control is transferred to address 0x8.
+#pragma code HIGH_INTERRUPT_VECTOR = 0x8
+void high_ISR (void)
+{
+	_asm
+		goto chooseInterrupt
+	_endasm
+}
+
 #pragma interrupt chooseInterrupt
 void chooseInterrupt(void)
 {

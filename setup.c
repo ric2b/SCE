@@ -47,4 +47,26 @@ void setup(void)
   /* LCD */
   ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
   OpenXLCD( FOUR_BIT & LINES_5X7 ); // 4-bit data interface; 2 x 16 characters
+
+
+  	while(BusyXLCD());
+  	WriteCmdXLCD(DOFF);	// Turn display off
+  	while(BusyXLCD());
+  	WriteCmdXLCD(CURSOR_OFF);	// Enable display with no cursor
+
+  	while(BusyXLCD());
+  	SetDDRamAddr(0x02);
+  	putcXLCD(':');
+
+  	while(BusyXLCD());
+  	SetDDRamAddr(0x05);
+  	putcXLCD(':');
+
+  	while(BusyXLCD());
+  	SetDDRamAddr(0x43);
+  	putcXLCD('C');
+
+  	while(BusyXLCD());
+  	SetDDRamAddr(0x4d);
+  	putcXLCD('L');
 }
