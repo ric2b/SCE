@@ -6,6 +6,7 @@ an ISR must be declared with no parameters and no return value
 
 Global variables that are accessed by both an ISR and mainline functions should be declared volatile.
 
+There is an 8x8 unsigned hardware multiplier that runs in 1 cycle.
 
 #PICmicro 18C MCU Family Reference Manual
 
