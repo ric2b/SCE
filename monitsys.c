@@ -1,37 +1,35 @@
-/*
-*/
-
 #include "main.h"
 #include "interrupts.h"
 #include "delays.h"
 #include "sensors.h"
 #include "configMode.h"
 
-void chooseInterrupt (void);  /* prototype needed for 'goto' below */
-void S3_isr (void);
-void t1_isr (void);
-void t3_isr (void);
+/* ----------- GLOBALS ---------------*/
+volatile time clock;
+time alarm;
+char temperature_treshold = 99;
+char lumos_treshold = 10;
+char updateLCD = 1;
+// these variables are changed by ISRs
+volatile char configMode = 0;
+volatile char configModeUpdated = 0;
+volatile char update_hours = 1;
+volatile char update_minutes = 1;
+volatile char update_seconds = 1;
+volatile char update_alt = 1;
+volatile char update_a = 1;
+volatile char update_P = 1;
+volatile char update_temp = 1;
+volatile char update_M = 1;
+volatile char update_lumus = 1;
 
-/*
- * For high interrupts, control is transferred to address 0x8.
- */
+// For high interrupts, control is transferred to address 0x8.
 #pragma code HIGH_INTERRUPT_VECTOR = 0x8
 void high_ISR (void)
 {
 	_asm
 		goto chooseInterrupt
 	_endasm
-}
-
-#pragma interrupt chooseInterrupt
-void chooseInterrupt(void)
-{
-	if(PIR1bits.TMR1IF)
-		t1_isr();
-	if(PIR2bits.TMR3IF)
-		t3_isr();
-	if(INTCONbits.INT0IF)
-		S3_isr();
 }
 
 #pragma code  /* allow the linker to locate the remaining code */

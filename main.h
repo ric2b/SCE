@@ -35,24 +35,23 @@ typedef struct time
 } time;
 
 /* ----------- GLOBALS ---------------*/
-volatile time clock;
-time alarm;
-char temperature_treshold = 99;
-char lumos_treshold = 10;
-char updateLCD = 1;
+extern time alarm;
+extern char temperature_treshold;
+extern char lumos_treshold;
+extern char updateLCD;
 // these variables are changed by ISRs
-volatile char configMode = 0;
-volatile char configModeUpdated = 0;
-volatile char update_hours = 1;
-volatile char update_minutes = 1;
-volatile char update_seconds = 1;
-volatile char update_alt = 1;
-volatile char update_a = 1;
-volatile char update_P = 1;
-volatile char update_temp = 1;
-volatile char update_M = 1;
-volatile char update_lumus = 1;
-
+extern volatile time clock;
+extern volatile char configMode;
+extern volatile char configModeUpdated;
+extern volatile char update_hours;
+extern volatile char update_minutes;
+extern volatile char update_seconds;
+extern volatile char update_alt;
+extern volatile char update_a;
+extern volatile char update_P;
+extern volatile char update_temp;
+extern volatile char update_M;
+extern volatile char update_lumus;
 
 /* ----------- FUNCTIONS ---------------*/
 void int_to_str(int raw, char *str);

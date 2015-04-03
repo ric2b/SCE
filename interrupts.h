@@ -3,6 +3,7 @@
 
 #include "main.h"
 
+void chooseInterrupt(void);
 void EnableHighInterrupts (void);
 void t1_isr (void);
 void t3_isr (void);

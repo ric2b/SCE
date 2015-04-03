@@ -61,10 +61,10 @@ file_009=no
 file_010=no
 [FILE_INFO]
 file_000=monitsys.c
-file_001=configMode.c
-file_002=delays.c
-file_003=sensors.c
-file_004=interrupts.c
+file_001=delays.c
+file_002=sensors.c
+file_003=interrupts.c
+file_004=configMode.c
 file_005=main.h
 file_006=configMode.h
 file_007=delays.h

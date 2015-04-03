@@ -1,5 +1,17 @@
 #include "interrupts.h"
 
+#pragma interrupt chooseInterrupt
+void chooseInterrupt(void)
+{
+	if(PIR1bits.TMR1IF)
+		t1_isr();
+	if(PIR2bits.TMR3IF)
+		t3_isr();
+	if(INTCONbits.INT0IF)
+		S3_isr();
+}
+
+#pragma code
 void t1_isr (void)
 {
 	WriteTimer1(0x8000);       // reload timer: 1 second : 0x8000
