@@ -28,6 +28,7 @@ typedef struct time
 } time;
 
 volatile time clock;
+time alarm;
 char temperature_treshold = 99;
 char lumos_treshold = 10;
 char updateLCD = 1;
@@ -162,13 +163,12 @@ void DelayXLCD( void )
 	return;
 }
 
-char * int_to_str(int raw, char *str)
+void int_to_str(int raw, char *str)
 {
 	str[1] = raw%10 + '0';
 	raw /= 10;
 	str[0] = raw + '0';
 	str[2] = 0;
-	return str;
 }
 
 char * readTemperature(char * temperature)
@@ -198,23 +198,38 @@ PORTBbits.RB3 = 0;
 
 void config()
 {
+	char time_buf[3];
+#ifdef debug
 	TRISBbits.TRISB2 = 0;
 	TRISBbits.TRISB3 = 0;
 	PORTBbits.RB2 = 1;
 	PORTBbits.RB3 = 0;
+#endif
+
+	while(BusyXLCD());
+
 	switch(configMode)
 	{		
 		case 1:
-			changeValueWithS2(&clock.hours);
-			clock.hours %= 24;
+			changeValueWithS2(&alarm.hours);
+			alarm.hours %= 24;
+			SetDDRamAddr(0x00);    // First line, first column
+			int_to_str(alarm.hours, time_buf);
+			putsXLCD(time_buf);
 			break;
 		case 2:
-			changeValueWithS2(&clock.minutes);
-			clock.minutes %= 60;
+			changeValueWithS2(&alarm.minutes);
+			alarm.minutes %= 60;
+			SetDDRamAddr(0x03);
+			int_to_str(alarm.minutes, time_buf);
+			putsXLCD(time_buf);
 			break;
 		case 3:
-			changeValueWithS2(&clock.seconds);
-			clock.seconds %= 60;
+			changeValueWithS2(&alarm.seconds);
+			alarm.seconds %= 60;
+			SetDDRamAddr(0x06);
+			int_to_str(alarm.seconds, time_buf);
+			putsXLCD(time_buf);
 			break;
 		case 4:
 			changeValueWithS2(&temperature_treshold);
@@ -227,6 +242,7 @@ void config()
 		case 6:
 			configMode = 0;
 			configModeUpdated = 0; // reset the variable
+			update_seconds = update_minutes = update_hours = 1;
 			break; 
 	}
 	updateLCD = 1;
@@ -245,6 +261,9 @@ void main (void)
 	clock.seconds = 0;
 	clock.minutes = 0;
 	clock.hours   = 0;
+	alarm.seconds = 0;
+	alarm.minutes = 0;
+	alarm.hours   = 0;
 
 	/* ADC init */
 	OpenADC(ADC_FOSC_32 & ADC_RIGHT_JUST & ADC_8ANA_0REF, ADC_CH0 & ADC_INT_OFF);
@@ -307,29 +326,29 @@ void main (void)
 			config();
 		}
 
-		if(update_seconds)
+		if(update_seconds & !configModeUpdated)
 		{
 			update_seconds = 0;
 			while(BusyXLCD());
-			SetDDRamAddr(0x06);    // First line, first column
+			SetDDRamAddr(0x06);
 			int_to_str(clock.seconds, time_buf);
-			putsXLCD(time_buf);    // data memory
+			putsXLCD(time_buf);
 
 			if(update_minutes)
 			{
 				update_minutes = 0;
 				while(BusyXLCD());
-				SetDDRamAddr(0x03);    // First line, first column
+				SetDDRamAddr(0x03);
 				int_to_str(clock.minutes, time_buf);
-				putsXLCD(time_buf);    // data memory
+				putsXLCD(time_buf);
 
 				if(update_hours)
 				{
 					update_hours = 0;
 					while(BusyXLCD());
-					SetDDRamAddr(0x00);    // First line, first column
+					SetDDRamAddr(0x00);
 					int_to_str(clock.hours, time_buf);
-					putsXLCD(time_buf);    // data memory
+					putsXLCD(time_buf);
 
 				}
 			}
