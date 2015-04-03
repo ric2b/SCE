@@ -1,61 +1,15 @@
 /*
 */
 
-#include <p18f452.h>  /* for the special function register declarations */
-#include <timers.h>
-#include <xlcd.h>
-#include <delays.h>
-#include <ADC.h>
-#include <portb.h>
-#include <i2c.h>
-
-#define debug
-
-#ifndef debug
-#define F_CPU 4000	// in kHz
-#else
-#define F_CPU 1000	// in kHz. used when in debug mode
-#endif
-
-#define PMON 5
-#define TSOM 2
-#define NREG 30
-
-#define TC74ADDR (0b10011011) // Address and READ command
-#define TC74ADDW (0b10011010)  // Address and WRITE command
-#define RTR (0x00)    // TC74 command - read temperature
-#define RWCR (0x01)    // TC74 command - read/write (config)
-
-typedef struct time
-{
-	char seconds;
-	char minutes;
-	char hours;
-} time;
-
-volatile time clock;
-time alarm;
-char temperature_treshold = 99;
-char lumos_treshold = 10;
-char updateLCD = 1;
-// these variables are changed by ISRs
-volatile char configMode = 0;
-volatile char configModeUpdated = 0;
-volatile char update_hours = 1;
-volatile char update_minutes = 1;
-volatile char update_seconds = 1;
-volatile char update_alt = 1;
-volatile char update_a = 1;
-volatile char update_P = 1;
-volatile char update_temp = 1;
-volatile char update_M = 1;
-volatile char update_lumus = 1;
+#include "main.h"
+#include "delays.h"
+#include "sensors.h"
+#include "configMode.h"
 
 void chooseInterrupt (void);  /* prototype needed for 'goto' below */
 void S3_isr (void);
 void t1_isr (void);
 void t3_isr (void);
-void config();
 
 /*
  * For high interrupts, control is transferred to address 0x8.
@@ -125,170 +79,6 @@ void EnableHighInterrupts (void)
 {
 	RCONbits.IPEN = 1;	/* The IPEN bit in the RCON register enables priority levels for interrupts. If clear, all priorities are set to high. */
 	INTCONbits.GIEH = 1;  /* Enables all un-masked high interrupts */
-}
-
-void delayms(short millis)
-{
-	short i, j;
-	for(i = 0; i < millis; i++)
-	{
-		for(j = 0; j < F_CPU/100; j++)
-		{	// 98 nops, not 100
-			Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();Nop();
-		}
-	}
-}
-
-/* LCD */
-
-void DelayFor18TCY( void )
-{
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-	Nop();
-}
-
-void DelayPORXLCD( void )
-{
-	Delay1KTCYx(60);
-	return;
-}
-
-void DelayXLCD( void )
-{
-	Delay1KTCYx(20);
-	return;
-}
-
-void int_to_str(int raw, char *str)
-{
-	str[1] = raw%10 + '0';
-	raw /= 10;
-	str[0] = raw + '0';
-	str[2] = 0;
-}
-
-void readTemperature(char * temperature)
-{
-	char value;
-	do{
-		IdleI2C();
-		StartI2C(); IdleI2C();
-		WriteI2C(TC74ADDW); IdleI2C(); // slave address + write
-		WriteI2C(RWCR); IdleI2C(); // Enable Read Write Config
-		RestartI2C(); IdleI2C(); // ?????
-
-		WriteI2C(TC74ADDR); IdleI2C(); // slave address + read
-		value = ReadI2C(); IdleI2C(); // Read from slave
-		NotAckI2C(); IdleI2C(); // No ACK from master means end of transmission
-		StopI2C(); IdleI2C();
-	} while (!(value & 0x40)); // ?????
-
-	IdleI2C();
-	StartI2C(); IdleI2C();
-	WriteI2C(TC74ADDW); IdleI2C(); // slave address + write
-	WriteI2C(RTR); IdleI2C(); // Enable Read Write Config
-	RestartI2C(); IdleI2C(); // ?????
-
-	WriteI2C(TC74ADDR); IdleI2C(); // slave address + read
-	value = ReadI2C(); IdleI2C(); // Read from slave
-	NotAckI2C(); IdleI2C(); // No ACK from master means end of transmission
-	StopI2C(); IdleI2C();
-
-	if(value>=0)
-	{
-		temperature[0] = value/10 + '0';
-		temperature[1] = value%10 + '0';
-	}
-	else
-	{
-		temperature[0] = 'N';
-		temperature[1] = 'E';
-	}
-
-
-	return;
-}
-
-void changeValueWithS2(char * value)
-{
-	if(PORTAbits.RA4 == 0)
-	{
-PORTBbits.RB3 = 1;
-		(*value)++;
-		delayms(500);
-		while(PORTAbits.RA4 == 0)
-		{
-			delayms(100);
-			(*value)++;
-		}
-	}
-PORTBbits.RB3 = 0;
-	return;
-}
-
-void config()
-{
-	char time_buf[3];
-#ifdef debug
-	TRISBbits.TRISB2 = 0;
-	TRISBbits.TRISB3 = 0;
-	PORTBbits.RB2 = 1;
-	PORTBbits.RB3 = 0;
-#endif
-	//reset the configurable variables
-	alarm.seconds = alarm.minutes = alarm.hours = 0;
-	temperature_treshold = 0;
-	lumos_treshold = 0;
-	while(BusyXLCD());
-
-	switch(configMode)
-	{
-		case 1:
-			changeValueWithS2(&alarm.hours);
-			alarm.hours %= 24;
-			SetDDRamAddr(0x00);    // First line, first column
-			int_to_str(alarm.hours, time_buf);
-			putsXLCD(time_buf);
-			break;
-		case 2:
-			changeValueWithS2(&alarm.minutes);
-			alarm.minutes %= 60;
-			SetDDRamAddr(0x03);
-			int_to_str(alarm.minutes, time_buf);
-			putsXLCD(time_buf);
-			break;
-		case 3:
-			changeValueWithS2(&alarm.seconds);
-			alarm.seconds %= 60;
-			SetDDRamAddr(0x06);
-			int_to_str(alarm.seconds, time_buf);
-			putsXLCD(time_buf);
-			break;
-		case 4:
-			changeValueWithS2(&temperature_treshold);
-			temperature_treshold %= 100;
-			break;
-		case 5:
-			changeValueWithS2(&lumos_treshold);
-			lumos_treshold %= 6;
-			break;
-		case 6:
-			configMode = 0;
-			configModeUpdated = 0; // reset the variable
-			update_seconds = update_minutes = update_hours = 1;
-			break;
-	}
-	updateLCD = 1;
 }
 
 /* main */
@@ -461,4 +251,12 @@ void main (void)
 		}
 
 	}
+}
+
+void int_to_str(int raw, char *str)
+{
+	str[1] = raw%10 + '0';
+	raw /= 10;
+	str[0] = raw + '0';
+	str[2] = 0;
 }
