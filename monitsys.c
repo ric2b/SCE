@@ -245,7 +245,10 @@ void config()
 	PORTBbits.RB2 = 1;
 	PORTBbits.RB3 = 0;
 #endif
-
+	//reset the configurable variables
+	alarm.seconds = alarm.minutes = alarm.hours = 0;
+	temperature_treshold = 0;
+	lumos_treshold = 0;
 	while(BusyXLCD());
 
 	switch(configMode)
@@ -277,7 +280,7 @@ void config()
 			break;
 		case 5:
 			changeValueWithS2(&lumos_treshold);
-			lumos_treshold %= 11;
+			lumos_treshold %= 6;
 			break;
 		case 6:
 			configMode = 0;
