@@ -19,7 +19,7 @@ void EEPROMTesting(){
 
 	while(BusyXLCD());
 	SetDDRamAddr(0x44);		// A por na posicao depois da temperatura
-	putcXLCD(teste);
+	putcXLCD(teste +'\0');
 }
 
 void readFromEEPROM(char *buffer){
