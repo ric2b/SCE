@@ -6,11 +6,11 @@ void EEPROMTesting(){
 
 	EEByteWrite(0xA0,0x30,0x45);	// Abrir a ligacao I2C
 	EEAckPolling(0xA0);				// Tratar dos Ack's
-	EECurrentAddRead(0x40);			// ???????????????
+	//EECurrentAddRead(0x40);			// ???????????????
 	EEByteWrite(0xA0, 0x70, buffer);// Escrever na EEPROM
 	EEAckPolling(0xA0);				// Tratar de Ack's, vamos passar a ler
 	teste = EERandomRead(0xA0,0x70);// Ler da EEPROM, o ponteiro de leitura é automaticamente incrementado
-	EERandomRead(0xA0, 0x30);		// ???????????????
+	//EERandomRead(0xA0, 0x30);		// ???????????????
 
 	while(BusyXLCD());
 	WriteCmdXLCD(DOFF);	// Turn display off
