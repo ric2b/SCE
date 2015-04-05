@@ -53,43 +53,13 @@ void addToEEPROM(int code){
 			data[6]=0;
 			data[7]=0;
 			break;
-		case 6:
+		default:
 			data[0]=clock.hours;
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
 			data[4]=temp;
 			data[5]=lumus;
-			data[6]=0;
-			data[7]=0;
-			break;
-		case 7:
-			data[0]=clock.hours;
-			data[1]=clock.minutes;
-			data[2]=clock.seconds;
-			data[3]=code;
-			data[4]=temp;
-			data[5]=lumus;
-			data[6]=0;
-			data[7]=0;
-			break;
-		case 8:
-			data[0]=clock.hours;
-			data[1]=clock.minutes;
-			data[2]=clock.seconds;
-			data[3]=code;
-			data[4]=temp;
-			data[5]=lumus;								//there is no global var for lum
-			data[6]=0;
-			data[7]=0;
-			break;
-		case 9:
-			data[0]=clock.hours;
-			data[1]=clock.minutes;
-			data[2]=clock.seconds;
-			data[3]=code;
-			data[4]=temp;
-			data[5]=lumus;								
 			data[6]=0;
 			data[7]=0;
 			break;
