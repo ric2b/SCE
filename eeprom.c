@@ -10,7 +10,7 @@ char readFromEEPROM(int address)
 		Delay1KTCYx(10); // Horribly hacky, can't make it work without it, Proteus slows down to a crawl
 		StartI2C(); IdleI2C();
 	}	while(WriteI2C(EEPROMW) != 0);
-
+	IdleI2C();
 	WriteI2C(addrHB); IdleI2C();
 	WriteI2C(addrLB); IdleI2C();
 	RestartI2C(); IdleI2C();
@@ -28,9 +28,12 @@ void writeToEEPROM(int address, char data)
 	char addrHB = address >> 8;
 	char addrLB = address & 0x00FF;
 
-	IdleI2C();
-	StartI2C(); IdleI2C();
-	WriteI2C(EEPROMW); IdleI2C(); // slave address + write
+	do // wait for the EEPROM to finish writing, at which point it will acknowledge
+	{
+		Delay1KTCYx(10); // Horribly hacky, can't make it work without it, Proteus slows down to a crawl
+		StartI2C(); IdleI2C();
+	}	while(WriteI2C(EEPROMW) != 0);
+	IdleI2C(); // slave address + write
 	WriteI2C(addrHB); IdleI2C(); // Enable Read Write Config
 	WriteI2C(addrLB); IdleI2C();
 	WriteI2C(data);
@@ -44,9 +47,12 @@ void write8BToEEPROM(int startAddress, char * data)
 	char addrHB = startAddress >> 8;
 	char addrLB = startAddress & 0x00FF;
 
-	IdleI2C();
-	StartI2C(); IdleI2C();
-	WriteI2C(EEPROMW); IdleI2C(); // slave address + write
+	do // wait for the EEPROM to finish writing, at which point it will acknowledge
+	{
+		Delay1KTCYx(10); // Horribly hacky, can't make it work without it, Proteus slows down to a crawl
+		StartI2C(); IdleI2C();
+	}	while(WriteI2C(EEPROMW) != 0);
+	IdleI2C(); // slave address + write
 	WriteI2C(addrHB); IdleI2C(); // Enable Read Write Config
 	WriteI2C(addrLB); IdleI2C();
 
@@ -55,13 +61,13 @@ void write8BToEEPROM(int startAddress, char * data)
 
 	IdleI2C();
 	StopI2C(); IdleI2C();
-
 }
+
 
 void EEPROMTesting(char teste)
 {
 	unsigned int buffer = 'h';
-	char string[9] = "HAPPYDAY";
+	char string[9] = "HAPPYBOT";
 
 		if (teste == 'k') writeToEEPROM(0x0004, 'Q');
 		else  writeToEEPROM(0x0004, 'q');
