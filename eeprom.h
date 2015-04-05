@@ -7,9 +7,9 @@
 
 void EEPROMTesting(char teste);
 
-void readFromEEPROM(char *buffer);
+char readFromEEPROM(int address);
 
-void writeToEEPROM(char buffer);
+void writeToEEPROM(int address, char data);
 
 
 #endif

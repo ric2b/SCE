@@ -10,33 +10,12 @@ void EEPROMTesting(char teste){
 
 		/* WRITE */
 
-	IdleI2C();
-	StartI2C(); IdleI2C();
-	WriteI2C(EEPROMW); IdleI2C(); // slave address + write
-	WriteI2C(0x00); IdleI2C(); // Enable Read Write Config
-	WriteI2C(ADDRLB); IdleI2C();
-
-	if(teste == 'k')	WriteI2C('T'); // check if writes after read still work
-	else	WriteI2C('G');
-
-	IdleI2C();
-	StopI2C(); IdleI2C();
+		if (teste == 'k') writeToEEPROM(0x0004, 'Q');
+		else  writeToEEPROM(0x0004, 'q');
 
 		/* READ */
 
-	do // wait for the EEPROM to finish writing, at which point it will acknowledge
-	{
-		Delay1KTCYx(10);
-		StartI2C(); IdleI2C();
-	}	while(WriteI2C(EEPROMW) != 0);
-
-	WriteI2C(0x00); IdleI2C();
-	WriteI2C(ADDRLB); IdleI2C();
-	RestartI2C(); IdleI2C();
-	WriteI2C(EEPROMR); IdleI2C();
-	buffer = ReadI2C(); IdleI2C(); // Read from slave
-	NotAckI2C(); IdleI2C(); // No ACK from master means end of transmission
-	StopI2C(); IdleI2C();
+		buffer = readFromEEPROM(0x0004);
 
 	/* Print to Screen */
 
@@ -53,16 +32,37 @@ void EEPROMTesting(char teste){
 		putcXLCD(buffer);
 }
 
-void readFromEEPROM(char *buffer){
-	EEByteWrite(0xA0,0x30,0x45);
-	EEAckPolling(0xA0);
-	*buffer = EERandomRead(0xA0,0x70);
-	EERandomRead(0xA0, 0x30);
+char readFromEEPROM(int address){
+	char addrHB = address >> 8;
+	char addrLB = address & 0x00FF;
+
+	do // wait for the EEPROM to finish writing, at which point it will acknowledge
+	{
+		Delay1KTCYx(10); // Horribly hacky, can't make it work without it, Proteus slows down to a crawl
+		StartI2C(); IdleI2C();
+	}	while(WriteI2C(EEPROMW) != 0);
+
+	WriteI2C(addrHB); IdleI2C();
+	WriteI2C(addrLB); IdleI2C();
+	RestartI2C(); IdleI2C();
+	WriteI2C(EEPROMR); IdleI2C();
+	addrLB = ReadI2C(); IdleI2C(); // Read from slave
+	NotAckI2C(); IdleI2C(); // No ACK from master means end of transmission
+	StopI2C(); IdleI2C();
+
+	return addrLB;
 }
 
-void writeToEEPROM(char buffer){
-	EEByteWrite(0xA0,0x30,0x45);
-	EEAckPolling(0xA0);
-	EECurrentAddRead(0x40);
-	EEByteWrite(0xA0, 0x70, buffer);
+void writeToEEPROM(int address, char data){
+	char addrHB = address >> 8;
+	char addrLB = address & 0x00FF;
+
+	IdleI2C();
+	StartI2C(); IdleI2C();
+	WriteI2C(EEPROMW); IdleI2C(); // slave address + write
+	WriteI2C(addrHB); IdleI2C(); // Enable Read Write Config
+	WriteI2C(addrLB); IdleI2C();
+	WriteI2C(data); // check if writes after read still work
+	IdleI2C();
+	StopI2C(); IdleI2C();
 }
