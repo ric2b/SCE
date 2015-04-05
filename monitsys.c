@@ -11,8 +11,10 @@
 volatile time clock;
 time alarm;
 char temperature_treshold = 99;
-char lumos_treshold = 10;
+char lumos_treshold = 5;
 char updateLCD = 1;
+char lumus = 0;
+char temp = 0;
 // these variables are changed by ISRs
 volatile char configMode = 0;
 volatile char configModeUpdated = 0;

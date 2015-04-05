@@ -2,6 +2,8 @@
 
 void setup(void)
 {
+  char notUsed[2];
+  int adc_result;
   clock.seconds = 0;
   clock.minutes = 0;
   clock.hours   = 0;
@@ -25,7 +27,7 @@ void setup(void)
 
   OpenTimer3(TIMER_INT_ON   &
       T3_16BIT_RW    &
-      T3_SOURCE_EXT  &	// to use TMR1 as input this must be set to EXT
+      T3_SOURCE_EXT  &  // to use TMR1 as input this must be set to EXT
       T3_PS_1_8      &
       T3_SYNC_EXT_ON );
 
@@ -49,24 +51,30 @@ void setup(void)
   OpenXLCD( FOUR_BIT & LINES_5X7 ); // 4-bit data interface; 2 x 16 characters
 
 
-  	while(BusyXLCD());
-  	WriteCmdXLCD(DOFF);	// Turn display off
-  	while(BusyXLCD());
-  	WriteCmdXLCD(CURSOR_OFF);	// Enable display with no cursor
+  while(BusyXLCD());
+  WriteCmdXLCD(DOFF); // Turn display off
+  while(BusyXLCD());
+  WriteCmdXLCD(CURSOR_OFF); // Enable display with no cursor
 
-  	while(BusyXLCD());
-  	SetDDRamAddr(0x02);
-  	putcXLCD(':');
+  while(BusyXLCD());
+  SetDDRamAddr(0x02);
+  putcXLCD(':');
 
-  	while(BusyXLCD());
-  	SetDDRamAddr(0x05);
-  	putcXLCD(':');
+  while(BusyXLCD());
+  SetDDRamAddr(0x05);
+  putcXLCD(':');
 
-  	while(BusyXLCD());
-  	SetDDRamAddr(0x43);
-  	putcXLCD('C');
+  while(BusyXLCD());
+  SetDDRamAddr(0x43);
+  putcXLCD('C');
 
-  	while(BusyXLCD());
-  	SetDDRamAddr(0x4d);
-  	putcXLCD('L');
+  while(BusyXLCD());
+  SetDDRamAddr(0x4d);
+  putcXLCD('L');
+
+  /* Initialize lumus and temp */
+  readTemperature(notUsed);
+
+  adc_result = ReadADC() >> 6;  //get ADC result
+  lumus = adc_result/204;
 }

@@ -37,6 +37,7 @@ void readTemperature(char * temperature)
 		temperature[0] = 'N';
 		temperature[1] = 'E';
 	}
+	temp = value;	// updated global variable for temperature
 
 	return;
 }

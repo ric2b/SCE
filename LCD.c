@@ -59,11 +59,12 @@ void updateScreen(void)
   if(update_lumus)
   {
     update_lumus = 0;
-    SetDDRamAddr(0x4f);	// Second line; first column
-    ConvertADC();	//perform ADC conversion
-    while(BusyADC());	//wait for result
-    adc_result = ReadADC() >> 6;	//get ADC result
-    putcXLCD(adc_result/204+'0');	// will be on [0,5]
+    SetDDRamAddr(0x4f); // Second line; first column
+    ConvertADC(); //perform ADC conversion
+    while(BusyADC()); //wait for result
+    adc_result = ReadADC() >> 6;  //get ADC result
+    lumus = adc_result/204;
+    putcXLCD(lumus+'0');  // will be on [0,5]
   }
 }
 
