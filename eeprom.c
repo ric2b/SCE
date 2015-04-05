@@ -1,25 +1,63 @@
 #include "eeprom.h"
 
 void EEPROMTesting(){
-	unsigned char buffer = 1;
-	unsigned char teste;
+  unsigned char data = 'x';
+  unsigned char result;
 
-	EEByteWrite(0xA0,0x30,0x45);	// Abrir a ligacao I2C
-	EEAckPolling(0xA0);				// Tratar dos Ack's
-	//EECurrentAddRead(0x40);			// ???????????????
-	EEByteWrite(0xA0, 0x70, buffer);// Escrever na EEPROM
-	EEAckPolling(0xA0);				// Tratar de Ack's, vamos passar a ler
-	teste = EERandomRead(0xA0,0x70);// Ler da EEPROM, o ponteiro de leitura é automaticamente incrementado
-	//EERandomRead(0xA0, 0x30);		// ???????????????
+  unsigned char write_High_Addr = 0x00;
+  unsigned char write_Low_Addr = 0x05; // random value
+  
+  CloseI2C(); // just in case it was open
+  OpenI2C(MASTER, SLEW_OFF);
+  SSPADD = 0b00000111;
 
-	while(BusyXLCD());
-	WriteCmdXLCD(DOFF);	// Turn display off
-	while(BusyXLCD());
-	WriteCmdXLCD(CURSOR_OFF);	// Enable display with no cursor
+  IdleI2C();
+  StartI2C();
+  while(SSPCON2bits.SEN); //waiting for end of start condition
+  do {
+    result = WriteI2C(0xA0);
+  } while(result != 0); // testing for a correct write
+  while(SSPCON2bits.ACKSTAT); // wait for ack
+  do {
+    result = WriteI2C(write_High_Addr);
+  } while( result != 0);
+  while(SSPCON2bits.ACKSTAT);
+  do {
+    result = WriteI2C(write_Low_Addr);
+  } while( result != 0);
+  while(SSPCON2bits.ACKSTAT);
+  do {
+    result = WriteI2C(data);             // Escrita done
+  } while( result != 0);
+  while(SSPCON2bits.ACKSTAT);
+  StopI2C();
+  IdleI2C();
 
-	while(BusyXLCD());
-	SetDDRamAddr(0x44);		// A por na posicao depois da temperatura
-	putcXLCD(teste +'\0');
+  // Leitura
+  IdleI2C();
+  StartI2C();
+  while(SSPCON2bits.SEN); //waiting for end of start condition
+  do {
+    result = WriteI2C(0xA0);
+  } while(result != 0);
+  while(SSPCON2bits.ACKSTAT); // wait for ack
+  do {
+    result = WriteI2C(write_High_Addr);
+  } while(result != 0);
+  while(SSPCON2bits.ACKSTAT);
+  do {
+    WriteI2C(write_Low_Addr);
+  } while( result != 0);
+  while(SSPCON2bits.ACKSTAT);
+  StartI2C();         // send new start condition
+  while(SSPCON2bits.SEN);   // wait for start condition to stop
+  do {
+    result = WriteI2C(0xA1);             //Dizer que e leitura
+  } while(result != 0);
+  while(SSPCON2bits.ACKSTAT);
+  result = ReadI2C();
+  NotAckI2C();
+  StopI2C(); 
 }
 
 void readFromEEPROM(char *buffer){
