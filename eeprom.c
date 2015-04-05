@@ -42,16 +42,10 @@ void EEPROMTesting(char teste)
 {
 	unsigned int buffer = 'h';
 
-		/* WRITE */
-
 		if (teste == 'k') writeToEEPROM(0x0004, 'Q');
 		else  writeToEEPROM(0x0004, 'q');
 
-		/* READ */
-
 		buffer = readFromEEPROM(0x0004);
-
-	/* Print to Screen */
 
 	while(BusyXLCD());
 	WriteCmdXLCD(DOFF);	// Turn display off

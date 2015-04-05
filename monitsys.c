@@ -39,7 +39,7 @@ void main (void)
 			config();
 		}
 
-		if(update_seconds)
+		if(update_seconds) // not a surefire way to run it every second, but close enough, just testing
 		{
 			if (teste != 'k') // just for testing, oscillate the values on the screen
 				teste = 'k';
