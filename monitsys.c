@@ -32,24 +32,29 @@ void main (void)
 	setup();
 
 	while(1)
-	{/*
+	{
+		/*
 		if(configModeUpdated)
 		{
 			config();
 		}
 		updateScreen();
 	}*/
-	if(update_seconds)
-	{
-		update_seconds = 0;
+		if(update_seconds)
+		{
+			update_seconds = 0;
 
-		if (teste != 'k')
-			teste = 'k';
-		else
-			teste = 'f';
+			if (teste != 'k') // just for testing, oscillate the values on the screen
+			{
+				teste = 'k';
+			}
+			else
+			{
+				teste = 'f';
+			}
 
-		EEPROMTesting(teste);
-	}
+			EEPROMTesting(teste);
+		}
 	}
 }
 
