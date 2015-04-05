@@ -33,28 +33,21 @@ void main (void)
 
 	while(1)
 	{
-		/*
+
 		if(configModeUpdated)
 		{
 			config();
 		}
-		updateScreen();
-	}*/
+
 		if(update_seconds)
 		{
-			update_seconds = 0;
-
 			if (teste != 'k') // just for testing, oscillate the values on the screen
-			{
 				teste = 'k';
-			}
-			else
-			{
+				else
 				teste = 'f';
-			}
-
-			EEPROMTesting(teste);
+				EEPROMTesting(teste);
 		}
+		updateScreen();
 	}
 }
 

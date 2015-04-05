@@ -1,38 +1,7 @@
 #include "eeprom.h"
 
-#define EEPROMW (0b10100000) // Address and WRITE command
-#define EEPROMR (0b10100001)  // Address and READ command
-#define ADDRHB (0x00)    // TC74 command - read temperature
-#define ADDRLB (0x01)    // TC74 command - read/write (config)
-
-void EEPROMTesting(char teste){
-	unsigned int buffer = 'h';
-
-		/* WRITE */
-
-		if (teste == 'k') writeToEEPROM(0x0004, 'Q');
-		else  writeToEEPROM(0x0004, 'q');
-
-		/* READ */
-
-		buffer = readFromEEPROM(0x0004);
-
-	/* Print to Screen */
-
-	while(BusyXLCD());
-	WriteCmdXLCD(DOFF);	// Turn display off
-	while(BusyXLCD());
-	WriteCmdXLCD(CURSOR_OFF);	// Enable display with no cursor
-
-	while(BusyXLCD());
-	SetDDRamAddr(0x00);		// A por na posicao depois da temperatura
-	if (buffer == 'h')
-		putcXLCD(teste);
-	else
-		putcXLCD(buffer);
-}
-
-char readFromEEPROM(int address){
+char readFromEEPROM(int address)
+{
 	char addrHB = address >> 8;
 	char addrLB = address & 0x00FF;
 
@@ -53,7 +22,9 @@ char readFromEEPROM(int address){
 	return addrLB;
 }
 
-void writeToEEPROM(int address, char data){
+
+void writeToEEPROM(int address, char data)
+{
 	char addrHB = address >> 8;
 	char addrLB = address & 0x00FF;
 
@@ -65,4 +36,32 @@ void writeToEEPROM(int address, char data){
 	WriteI2C(data); // check if writes after read still work
 	IdleI2C();
 	StopI2C(); IdleI2C();
+}
+
+void EEPROMTesting(char teste)
+{
+	unsigned int buffer = 'h';
+
+		/* WRITE */
+
+		if (teste == 'k') writeToEEPROM(0x0004, 'Q');
+		else  writeToEEPROM(0x0004, 'q');
+
+		/* READ */
+
+		buffer = readFromEEPROM(0x0004);
+
+	/* Print to Screen */
+
+	while(BusyXLCD());
+	WriteCmdXLCD(DOFF);	// Turn display off
+	while(BusyXLCD());
+	WriteCmdXLCD(CURSOR_OFF);	// Enable display with no cursor
+
+	while(BusyXLCD());
+	SetDDRamAddr(0x49);		// A por na posicao depois do M
+	if (buffer == 'h')
+		putcXLCD(teste);
+	else
+		putcXLCD(buffer);
 }
