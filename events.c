@@ -9,8 +9,8 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=temperature[1]*10+temperature[0];	//there is no global var for temp
-			data[5]=lumus;								//there is no global var for lum
+			data[4]=temp;
+			data[5]=lumus;
 			data[6]=0;
 			data[7]=0;
 		case 2:		// this case looks dumb.. need a double check
@@ -58,8 +58,8 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=temperature[1]*10+temperature[0];	//there is no global var for temp
-			data[5]=lumus;								//there is no global var for lum
+			data[4]=temp;
+			data[5]=lumus;
 			data[6]=0;
 			data[7]=0;
 			break;
@@ -68,8 +68,8 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=temperature[1]*10+temperature[0];	//there is no global var for temp
-			data[5]=lumus;								//there is no global var for lum
+			data[4]=temp;
+			data[5]=lumus;
 			data[6]=0;
 			data[7]=0;
 			break;
@@ -78,7 +78,7 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=temperature[1]*10+temperature[0];	//there is no global var for temp
+			data[4]=temp;
 			data[5]=lumus;								//there is no global var for lum
 			data[6]=0;
 			data[7]=0;
@@ -88,13 +88,13 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=temperature[1]*10+temperature[0];	//there is no global var for temp
-			data[5]=lumus;								//there is no global var for lum
+			data[4]=temp;
+			data[5]=lumus;								
 			data[6]=0;
 			data[7]=0;
 			break;
 	}
-	// function that writes to eeprom 8 bytes;
+	write8BToEEPROM(writePointer, data);
 	writePointer++;
 	if(writePointer >= NREG)
 	{
