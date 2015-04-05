@@ -1,5 +1,6 @@
 #include "main.h"
 #include "setup.h"
+#include "eeprom.h"
 #include "LCD.h"
 #include "interrupts.h"
 #include "delays.h"
@@ -27,15 +28,28 @@ volatile char update_lumus = 1;
 
 void main (void)
 {
+	char teste;
 	setup();
 
 	while(1)
-	{
+	{/*
 		if(configModeUpdated)
 		{
 			config();
 		}
 		updateScreen();
+	}*/
+	if(update_seconds)
+	{
+		update_seconds = 0;
+
+		if (teste != 'k')
+			teste = 'k';
+		else
+			teste = 'f';
+
+		EEPROMTesting(teste);
+	}
 	}
 }
 

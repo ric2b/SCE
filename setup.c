@@ -40,9 +40,9 @@ void setup(void)
 
   /* I2C */
   TRISC = 0b00011000; // I2C pins
-  SSPADD = 0b00000111;    // Set baud rate
-
-  OpenI2C(MASTER, SLEW_OFF);
+  //SSPADD = 0b00000111;    // Set baud rate
+  SSPADD = 9;
+  OpenI2C(MASTER, SLEW_ON);
 
   /* LCD */
   ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
