@@ -10,6 +10,7 @@
 
 char readFromEEPROM(int address);
 void writeToEEPROM(int address, char data);
+void write8BToEEPROM(int startAddress, char * data);
 void EEPROMTesting(char teste);
 
 #endif
