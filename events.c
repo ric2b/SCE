@@ -94,7 +94,7 @@ void addToEEPROM(int code){
 			data[7]=0;
 			break;
 	}
-	write8BToEEPROM(writePointer, data);
+	// write8BToEEPROM(writePointer, data); pointer isnt ready to use yet
 	writePointer++;
 	if(writePointer >= NREG)
 	{
