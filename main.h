@@ -15,7 +15,7 @@
 #ifndef debug
 #define F_CPU 4000	// in kHz
 #else
-#define F_CPU 1000	// in kHz. used when in debug mode
+#define F_CPU 4000	// in kHz. used when in debug mode
 #endif
 
 #define PMON 5
