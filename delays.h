@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-void delayms(short millis);
+void delayms(unsigned short millis);
 void DelayFor18TCY( void );
 void DelayPORXLCD( void );
 void DelayXLCD( void );

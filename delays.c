@@ -1,6 +1,6 @@
 #include "delays.h"
 
-void delayms(short millis)
+void delayms(unsigned short millis)
 {
 	short i, j;
 	for(i = 0; i < millis; i++)
