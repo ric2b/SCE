@@ -9,5 +9,6 @@ void config(void);
 char cursorState( char ignore );
 char changeValueWithS2(char * value);
 void updateClockField(char LCDaddr, char * fielddata, char modulos);
+void alarmONOFF(char alarmID,  char character, char LCDaddr);
 
 #endif

@@ -37,6 +37,7 @@ extern char lumos_treshold;
 extern char updateLCD;
 extern char lumus;
 extern char temp;
+extern char alarmMask;
 // these variables are changed by ISRs
 extern volatile time clock;
 extern volatile char configMode;
