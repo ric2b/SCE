@@ -36,7 +36,7 @@ void main (void)
 	while(1)
 	{
 
-		if(configModeUpdated)
+		while(configMode)
 		{
 			config();
 		}

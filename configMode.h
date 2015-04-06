@@ -6,6 +6,7 @@
 #include "delays.h"
 
 void config(void);
-void changeValueWithS2(char * value);
+char cursorState( char ignore );
+char changeValueWithS2(char * value);
 
 #endif
