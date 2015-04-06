@@ -3,7 +3,6 @@
 void config()
 {
 	char time_buf[3];
-	char blink;
 
 #ifdef debug
 	TRISBbits.TRISB2 = 0;
@@ -22,91 +21,19 @@ void config()
 		case 1: // hours
 			while(configMode == 1)
 			{
-				if(changeValueWithS2(&alarm.hours))
-				{
-					alarm.hours %= 24;
-					SetDDRamAddr(0x00);    // First line, first column
-					int_to_str(alarm.hours, time_buf);
-					putsXLCD(time_buf);
-					blink = cursorState(1); // ignore next second update
-				}
-				else
-					blink = cursorState(0);
-
-				if(blink > 0)
-				{
-					SetDDRamAddr(0x00);
-					int_to_str(alarm.hours, time_buf);
-					putsXLCD(time_buf);
-				}
-				if(blink == 0)
-				{
-					SetDDRamAddr(0x00);
-					time_buf[0] = ' ';
-					time_buf[1] = ' ';
-					time_buf[2] = 0;
-					putsXLCD(time_buf);
-				}
+				updateClockField(0x00, &alarm.hours, 24);
 			}
 			break;
 		case 2: // minutes
 			while(configMode == 2)
 			{
-				if(changeValueWithS2(&alarm.minutes))
-				{
-					alarm.minutes %= 60;
-					SetDDRamAddr(0x03);
-					int_to_str(alarm.minutes, time_buf);
-					putsXLCD(time_buf);
-					blink = cursorState(1); // ignore next second update
-				}
-				else
-					blink = cursorState(0);
-
-					if(blink > 0)
-					{
-					SetDDRamAddr(0x03);
-					int_to_str(alarm.minutes, time_buf);
-					putsXLCD(time_buf);
-				}
-				if(blink == 0)
-				{
-					SetDDRamAddr(0x03);
-					time_buf[0] = ' ';
-					time_buf[1] = ' ';
-					time_buf[2] = 0;
-					putsXLCD(time_buf);
-				}
+				updateClockField(0x03, &alarm.minutes, 60);
 			}
 			break;
 		case 3: // seconds
 			while(configMode == 3)
 			{
-				if(changeValueWithS2(&alarm.seconds))
-				{
-					alarm.seconds %= 60;
-					SetDDRamAddr(0x06);
-					int_to_str(alarm.seconds, time_buf);
-					putsXLCD(time_buf);
-					blink = cursorState(1); // ignore next second update
-				}
-				else
-					blink = cursorState(0);
-
-					if(blink > 0)
-					{
-						SetDDRamAddr(0x06);
-					int_to_str(alarm.seconds, time_buf);
-					putsXLCD(time_buf);
-				}
-				if(blink == 0)
-				{
-					SetDDRamAddr(0x06);
-					time_buf[0] = ' ';
-					time_buf[1] = ' ';
-					time_buf[2] = 0;
-					putsXLCD(time_buf);
-				}
+				updateClockField(0x06, &alarm.seconds, 60);
 			}
 			break;
 		case 4: // alarm cfg
@@ -161,4 +88,36 @@ char changeValueWithS2(char * value)
 		return 1;
 	}
 	return 0;
+}
+
+void updateClockField(char LCDaddr, char * fielddata, char modulos)
+{
+	char time_buf[3];
+	char blink;
+	
+	if(changeValueWithS2(fielddata))
+	{
+		*fielddata %= modulos;
+		SetDDRamAddr(LCDaddr);
+		int_to_str(*fielddata, time_buf);
+		putsXLCD(time_buf);
+		blink = cursorState(1); // ignore next second update
+	}
+	else
+		blink = cursorState(0);
+
+		if(blink > 0)
+		{
+			SetDDRamAddr(LCDaddr);
+			int_to_str(*fielddata, time_buf);
+		putsXLCD(time_buf);
+	}
+	if(blink == 0)
+	{
+		SetDDRamAddr(LCDaddr);
+		time_buf[0] = ' ';
+		time_buf[1] = ' ';
+		time_buf[2] = 0;
+		putsXLCD(time_buf);
+	}
 }
