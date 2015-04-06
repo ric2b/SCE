@@ -11,7 +11,7 @@
 volatile time clock;
 time alarm;
 char temperature_treshold = 99;
-char lumos_treshold = 5;
+char lumus_treshold = 5;
 char updateLCD = 1;
 char lumus = 0;
 char temp = 0;

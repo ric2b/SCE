@@ -13,7 +13,7 @@ void config()
 	//reset the configurable variables
 	alarm.seconds = alarm.minutes = alarm.hours = 0;
 	temperature_treshold = 0;
-	lumos_treshold = 0;
+	lumus_treshold = 0;
 	while(BusyXLCD());
 
 	switch(configMode)

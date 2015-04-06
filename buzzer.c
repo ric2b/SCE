@@ -2,6 +2,7 @@
 #include <pwm.h>
 #include <timers.h>
 #include "main.h"
+#include "buzzer.h"
 #include "delays.h"
 
 #define TMR2_PRES	16 // timer2 prescaller. used to calculate PWM frequency. prescaller must be changed in OpenTimer2 too
@@ -43,4 +44,3 @@ void buzzTest()
 
 	buzzKill();
 }
-

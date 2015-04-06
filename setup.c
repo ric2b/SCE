@@ -1,4 +1,5 @@
 #include "setup.h"
+#include "sensors.h"
 
 void setup(void)
 {

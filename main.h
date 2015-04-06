@@ -33,7 +33,7 @@ typedef struct time
 /* ----------- GLOBALS ---------------*/
 extern time alarm;
 extern char temperature_treshold;
-extern char lumos_treshold;
+extern char lumus_treshold;
 extern char updateLCD;
 extern char lumus;
 extern char temp;
