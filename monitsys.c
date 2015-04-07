@@ -17,6 +17,7 @@ char updateLCD = 1;
 char lumus = 0;
 char temp = 0;
 char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled
+char sleeping = 0;
 // these variables are changed by ISRs
 volatile char configMode = 0;
 volatile char configModeUpdated = 0;
@@ -43,7 +44,11 @@ void main (void)
 			//setupConfigLCD();
 			config();
 		}
-		updateScreen();
+
+		if(!sleeping)
+		{
+			updateScreen();
+		}
 	}
 }
 

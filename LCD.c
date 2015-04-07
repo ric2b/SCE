@@ -7,6 +7,10 @@ void updateScreen(void)
   long int count = 0;
   int adc_result = 0;
 
+  // awake LCD
+  while(BusyXLCD());
+  WriteCmdXLCD(CURSOR_OFF);
+
   if(update_seconds & !configModeUpdated)
   {
     updateClock(clock, buffer);

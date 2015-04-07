@@ -57,8 +57,15 @@ void t3_isr (void)
 void S3_isr (void)
 {
 	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
-	configMode++;
-	configModeUpdated = 1;
+	if(sleeping == 1)
+	{
+		sleeping = 0;
+	}
+	else
+	{
+		configMode++;
+		configModeUpdated = 1;
+	}
 }
 
 void EnableHighInterrupts (void)

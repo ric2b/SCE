@@ -1,6 +1,7 @@
 #include "main.h"
 #include "sensors.h"
 #include "LCD.h"
+#include "delays.h"
 
 char cursorState( char ignore )
 { // use TMR1L TMR1H to get shorter time scales
@@ -8,7 +9,7 @@ char cursorState( char ignore )
 	{
 		update_seconds = 0;
 		if(!ignore) // if the field was recently updated, wait at least 1 second
-			return clock.seconds % 2; // if 0, blink cursor (delete the number from the screen)
+			return clock.seconds & 1; // if 0, blink cursor (delete the number from the screen)
 	}
 	return -1;
 }
@@ -62,7 +63,7 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 		}
 		putsXLCD(time_buf);
 	}
-	if(blink == 0)
+	else if(blink == 0)
 	{
 		SetDDRamAddr(LCDaddr);
 		time_buf[0] = ' ';
@@ -116,6 +117,12 @@ void config()
 	//alarm.seconds = alarm.minutes = alarm.hours = 0;
 	temperature_treshold = 0;
 	lumus_treshold = 0;
+
+	// put P from low power mode
+	while(BusyXLCD());
+	SetDDRamAddr(0x0f);
+	putcXLCD('P');
+
 	while(BusyXLCD());
 
 	switch(configMode)
@@ -237,6 +244,9 @@ void config()
 					update_P = 1;
 					configMode = 0;
 					configModeUpdated = 0;
+					while(BusyXLCD());
+					WriteCmdXLCD(DOFF);
+					sleeping = 1;
 				}
 			}
 			break;
