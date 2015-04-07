@@ -1,4 +1,5 @@
 #include "interrupts.h"
+#include "main.h"
 
 // For high interrupts, control is transferred to address 0x8.
 #pragma code HIGH_INTERRUPT_VECTOR = 0x8
@@ -14,8 +15,6 @@ void chooseInterrupt(void)
 {
 	if(PIR1bits.TMR1IF)
 		t1_isr();
-	if(PIR2bits.TMR3IF)
-		t3_isr();
 	if(INTCONbits.INT0IF)
 		S3_isr();
 }
@@ -44,14 +43,14 @@ void t1_isr (void)
 		}
 	}
 
-	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
-}
+	pmon_counter++;
+	if(pmon_counter == PMON)
+	{
+		pmon_counter = 0;
+		update_temp = update_lumus = 1;
+	}
 
-void t3_isr (void)
-{
-	WriteTimer3(0x10000 - (0x8000/8)*PMON);       // reload timer: 1 second : 0x8000
-	PIR2bits.TMR3IF = 0;         // clear flag to avoid another interrupt
-	update_temp = update_lumus = 1;
+	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
 }
 
 void S3_isr (void)

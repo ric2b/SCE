@@ -53,6 +53,7 @@ extern volatile char update_P;
 extern volatile char update_temp;
 extern volatile char update_M;
 extern volatile char update_lumus;
+extern volatile char pmon_counter;
 
 /* ----------- FUNCTIONS ---------------*/
 void int_to_str(int raw, char *str);

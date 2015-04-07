@@ -30,15 +30,14 @@ volatile char update_P = 0;
 volatile char update_temp = 1;
 volatile char update_M = 1;
 volatile char update_lumus = 1;
+volatile char pmon_counter = 0;
 
 void main (void)
 {
-	char teste;
 	setup();
 
 	while(1)
 	{
-
 		while(configMode)
 		{
 			//setupConfigLCD();
@@ -49,6 +48,8 @@ void main (void)
 		{
 			updateScreen();
 		}
+
+		_asm sleep _endasm
 	}
 }
 

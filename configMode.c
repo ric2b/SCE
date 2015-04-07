@@ -247,6 +247,7 @@ void config()
 					while(BusyXLCD());
 					WriteCmdXLCD(DOFF);
 					sleeping = 1;
+					_asm sleep _endasm
 				}
 			}
 			break;

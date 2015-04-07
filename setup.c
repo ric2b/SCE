@@ -26,12 +26,6 @@ void setup(void)
       T1_OSC1EN_ON   &
       T1_SYNC_EXT_ON );
 
-  OpenTimer3(TIMER_INT_ON   &
-      T3_16BIT_RW    &
-      T3_SOURCE_EXT  &  // to use TMR1 as input this must be set to EXT
-      T3_PS_1_8      &
-      T3_SYNC_EXT_ON );
-
   /* enable external interrupt on pin RB0/INT0 */
   TRISBbits.TRISB0 = 1;
   OpenRB0INT(PORTB_CHANGE_INT_ON & FALLING_EDGE_INT & PORTB_PULLUPS_OFF);
@@ -51,11 +45,8 @@ void setup(void)
   ADCON1 = 0x0E;                    // Port A: A0 - analog; A1-A7 - digital
   OpenXLCD( FOUR_BIT & LINES_5X7 ); // 4-bit data interface; 2 x 16 characters
 
-
   while(BusyXLCD());
-  WriteCmdXLCD(DOFF); // Turn display off
-  while(BusyXLCD());
-  WriteCmdXLCD(CURSOR_OFF); // Enable display with no cursor
+  WriteCmdXLCD(DOFF); // Turn display off. will be turned on later
 
   while(BusyXLCD());
   SetDDRamAddr(0x02);
