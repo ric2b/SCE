@@ -1,4 +1,103 @@
-#include "configMode.h"
+#include "main.h"
+#include "sensors.h"
+#include "LCD.h"
+
+char cursorState( char ignore )
+{ // use TMR1L TMR1H to get shorter time scales
+	if(update_seconds == 1)
+	{
+		update_seconds = 0;
+		if(!ignore) // if the field was recently updated, wait at least 1 second
+			return clock.seconds % 2; // if 0, blink cursor (delete the number from the screen)
+	}
+	return -1;
+}
+
+char changeValueWithS2(char * value)
+{
+	if(PORTAbits.RA4 == 0)
+	{
+		while(PORTAbits.RA4 == 0);
+
+		PORTBbits.RB3 = 1; // activa led
+		(*value)++;
+/*		delayms(500);
+		while(PORTAbits.RA4 == 0)
+		{
+			delayms(100);
+			(*value)++;
+		}
+	*/PORTBbits.RB3 = 0;
+		return 1;
+	}
+	return 0;
+}
+
+void updateClockField(char LCDaddr, char * fielddata, char modulos)
+{
+	char time_buf[3];
+	char blink;
+
+	if(changeValueWithS2(fielddata))
+	{
+		*fielddata %= modulos;
+		SetDDRamAddr(LCDaddr);
+		int_to_str(*fielddata, time_buf);
+		putsXLCD(time_buf);
+		blink = cursorState(1); // ignore next second update
+	}
+	else
+		blink = cursorState(0);
+
+	if(blink > 0)
+	{
+		SetDDRamAddr(LCDaddr);
+		if(*fielddata != -1)
+			int_to_str(*fielddata, time_buf);
+		else
+		{
+			time_buf[0] = '-';
+			time_buf[1] = '-';
+			time_buf[2] = 0;
+		}
+		putsXLCD(time_buf);
+	}
+	if(blink == 0)
+	{
+		SetDDRamAddr(LCDaddr);
+		time_buf[0] = ' ';
+		time_buf[1] = ' ';
+		time_buf[2] = 0;
+		putsXLCD(time_buf);
+	}
+}
+
+char alarmONOFF(char alarmID, char character, char LCDaddr)
+{
+	char buffer[3];
+	char blink;
+	// this section blinks the alarm character
+	blink = cursorState(0);
+	SetDDRamAddr(LCDaddr);
+	if(blink == 0)
+		putcXLCD(' ');
+	if(blink > 0)
+		putcXLCD(character);
+	// this section changes the active status of the alarm
+	if(changeValueWithS2(buffer)) //ignore the buffer
+	{
+		alarmMask ^= (0b00000100 >> alarmID);
+		SetDDRamAddr(0x0d);
+		if(alarmMask & (0b00000100 >> alarmID))
+		{
+			putcXLCD('A');
+			return 1; // if the user pressed the button and the new status is ACTIVE
+		}
+		else
+			putcXLCD('a');
+	}
+	return 0;
+}
 
 void config()
 {
@@ -188,103 +287,6 @@ void config()
 	}
 	update_seconds = update_minutes = update_hours = 1;
 	updateLCD = 1;
-}
-
-char cursorState( char ignore )
-{ // use TMR1L TMR1H to get shorter time scales
-	if(update_seconds == 1)
-	{
-		update_seconds = 0;
-		if(!ignore) // if the field was recently updated, wait at least 1 second
-			return clock.seconds % 2; // if 0, blink cursor (delete the number from the screen)
-	}
-	return -1;
-}
-
-char changeValueWithS2(char * value)
-{
-	if(PORTAbits.RA4 == 0)
-	{
-		while(PORTAbits.RA4 == 0);
-
-		PORTBbits.RB3 = 1; // activa led
-		(*value)++;
-/*		delayms(500);
-		while(PORTAbits.RA4 == 0)
-		{
-			delayms(100);
-			(*value)++;
-		}
-	*/PORTBbits.RB3 = 0;
-		return 1;
-	}
-	return 0;
-}
-
-void updateClockField(char LCDaddr, char * fielddata, char modulos)
-{
-	char time_buf[3];
-	char blink;
-
-	if(changeValueWithS2(fielddata))
-	{
-		*fielddata %= modulos;
-		SetDDRamAddr(LCDaddr);
-		int_to_str(*fielddata, time_buf);
-		putsXLCD(time_buf);
-		blink = cursorState(1); // ignore next second update
-	}
-	else
-		blink = cursorState(0);
-
-	if(blink > 0)
-	{
-		SetDDRamAddr(LCDaddr);
-		if(*fielddata != -1)
-			int_to_str(*fielddata, time_buf);
-		else
-		{
-			time_buf[0] = '-';
-			time_buf[1] = '-';
-			time_buf[2] = 0;
-		}
-		putsXLCD(time_buf);
-	}
-	if(blink == 0)
-	{
-		SetDDRamAddr(LCDaddr);
-		time_buf[0] = ' ';
-		time_buf[1] = ' ';
-		time_buf[2] = 0;
-		putsXLCD(time_buf);
-	}
-}
-
-char alarmONOFF(char alarmID, char character, char LCDaddr)
-{
-	char buffer[3];
-	char blink;
-	// this section blinks the alarm character
-	blink = cursorState(0);
-	SetDDRamAddr(LCDaddr);
-	if(blink == 0)
-		putcXLCD(' ');
-	if(blink > 0)
-		putcXLCD(character);
-	// this section changes the active status of the alarm
-	if(changeValueWithS2(buffer)) //ignore the buffer
-	{
-		alarmMask ^= (0b00000100 >> alarmID);
-		SetDDRamAddr(0x0d);
-		if(alarmMask & (0b00000100 >> alarmID))
-		{
-			putcXLCD('A');
-			return 1; // if the user pressed the button and the new status is ACTIVE
-		}
-		else
-			putcXLCD('a');
-	}
-	return 0;
 }
 
 void clearConfigScreen( void )
