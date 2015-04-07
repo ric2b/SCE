@@ -4,6 +4,7 @@ void config()
 {
 	char buffer[3];
 	char changed = 0;
+	char blink;
 	time temp;
 
 #ifdef debug
@@ -30,11 +31,12 @@ void config()
 					changed = 1;
 			}
 			if(changed == 1)
-				clock.hours = temp.hours;
+				clockToChange->hours = temp.hours;
 			SetDDRamAddr(0x00);
-			int_to_str(clock.hours, buffer);
+			int_to_str(clockToChange->hours, buffer);
 			putsXLCD(buffer);
 			break;
+
 		case 2: // minutes
 			changed = 0;
 			temp.minutes = -1;
@@ -45,11 +47,12 @@ void config()
 					changed = 1;
 			}
 			if(changed == 1)
-				clock.minutes = temp.minutes;
+				clockToChange->minutes = temp.minutes;
 			SetDDRamAddr(0x03);
-			int_to_str(clock.minutes, buffer);
+			int_to_str(clockToChange->minutes, buffer);
 			putsXLCD(buffer);
 			break;
+
 		case 3: // seconds
 			changed = 0;
 			temp.seconds = -1;
@@ -60,11 +63,13 @@ void config()
 					changed = 1;
 			}
 			if(changed == 1)
-				clock.seconds = temp.seconds;
+				clockToChange->seconds = temp.seconds;
 			SetDDRamAddr(0x06);
-			int_to_str(clock.seconds, buffer);
+			int_to_str(clockToChange->seconds, buffer);
 			putsXLCD(buffer);
+			clockToChange = &clock;
 			break;
+
 		case 4: // alarm cfg
 			SetDDRamAddr(0x0d);
 			if(alarmMask & 0b00000100)
@@ -74,13 +79,18 @@ void config()
 
 			while(configMode == 4)
 			{
-				alarmONOFF(0, 'A', 0x09);
+				if(alarmONOFF(0, 'A', 0x09)) // user activated the alarm, configure it
+				{
+					clockToChange = &alarm;
+					configMode = 1;
+				}
 			}
 			SetDDRamAddr(0x09);
 			putcXLCD('A');
 			//changeValueWithS2(&temperature_treshold);
 			//temperature_treshold %= 100;
 			break;
+
 		case 5: // activate temperature
 			SetDDRamAddr(0x0d);
 			if(alarmMask & 0b00000010)
@@ -97,6 +107,7 @@ void config()
 			//changeValueWithS2(&lumos_treshold);
 			//lumos_treshold %= 6;
 			break;
+
 		case 6: // activate lumos
 			SetDDRamAddr(0x0d);
 			if(alarmMask & 0b00000001)
@@ -111,16 +122,71 @@ void config()
 			SetDDRamAddr(0x0B);
 			putcXLCD('L');
 			break;
+
 		case 7: // energy savings
+			while(configMode == 7)
+			{
+				SetDDRamAddr(0x0f);
+				blink = cursorState(0);
+				if(blink == 0)
+					putcXLCD(' ');
+				if(blink > 0)
+					putcXLCD('P');
+
+				if(changeValueWithS2(&blink)) //ignore blink
+				{
+					update_P = 1;
+					configMode = 0;
+					configModeUpdated = 0;
+				}
+			}
+			break;
+
+		case 8: // temperature threshold
+			changed = 0;
+			blink = -1;
+			while(configMode == 8)
+			{
+				updateClockField(0x40, &blink, 100);
+				if(blink != -1)
+					changed = 1;
+			}
+			if(changed == 1)
+				temperature_treshold = blink;
+			SetDDRamAddr(0x40);
+			readTemperature(buffer);
+			updateTemp(buffer);
+			break;
+
+		case 9: // lumos threshold
+			changed = 0;
+			blink = -1;
+			while(configMode == 9)
+			{
+				updateClockField(0x4e, &blink, 6);
+				if(cursorState(0) != -1) // UGLY HACKINESS, PLEASE CHANGE
+				{
+					SetDDRamAddr(0x4e);
+					putcXLCD(' ');
+				}
+				if(blink != -1)
+					changed = 1;
+			}
+			if(changed == 1)
+				lumus_treshold = blink;
+			SetDDRamAddr(0x4e);
+			putcXLCD(' ');
+			ConvertADC();
+			putcXLCD((ReadADC() >> 6)/204+'0');
+			break;
+
+		default:
 			configMode = 0;
 			configModeUpdated = 0; // reset the variable
 			update_seconds = update_minutes = update_hours = 1;
 			break;
-		case 8: // temperature threshold
-			break;
-		case 9: // lumos threshold
-			break;
 	}
+	update_seconds = update_minutes = update_hours = 1;
 	updateLCD = 1;
 }
 
@@ -194,29 +260,34 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 	}
 }
 
-void alarmONOFF(char alarmID, char character, char LCDaddr)
+char alarmONOFF(char alarmID, char character, char LCDaddr)
 {
 	char buffer[3];
 	char blink;
-
+	// this section blinks the alarm character
 	blink = cursorState(0);
 	SetDDRamAddr(LCDaddr);
 	if(blink == 0)
-	{
 		putcXLCD(' ');
-	}
 	if(blink > 0)
-	{
 		putcXLCD(character);
-	}
-
+	// this section changes the active status of the alarm
 	if(changeValueWithS2(buffer)) //ignore the buffer
 	{
 		alarmMask ^= (0b00000100 >> alarmID);
 		SetDDRamAddr(0x0d);
 		if(alarmMask & (0b00000100 >> alarmID))
+		{
 			putcXLCD('A');
-			else
-			putcXLCD('a');
+			return 1; // if the user pressed the button and the new status is ACTIVE
 		}
+		else
+			putcXLCD('a');
+	}
+	return 0;
+}
+
+void clearConfigScreen( void )
+{
+
 }

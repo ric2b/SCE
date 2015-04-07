@@ -10,6 +10,7 @@
 /* ----------- GLOBALS ---------------*/
 volatile time clock;
 time alarm;
+time * clockToChange = &clock;
 char temperature_treshold = 99;
 char lumus_treshold = 5;
 char updateLCD = 1;
@@ -22,9 +23,9 @@ volatile char configModeUpdated = 0;
 volatile char update_hours = 1;
 volatile char update_minutes = 1;
 volatile char update_seconds = 1;
-volatile char update_alt = 1;
-volatile char update_a = 1;
-volatile char update_P = 1;
+volatile char update_alt = 0;
+volatile char update_a = 0;
+volatile char update_P = 0;
 volatile char update_temp = 1;
 volatile char update_M = 1;
 volatile char update_lumus = 1;
@@ -39,16 +40,8 @@ void main (void)
 
 		while(configMode)
 		{
+			//setupConfigLCD();
 			config();
-		}
-
-		if(update_seconds) // not a surefire way to run it every second, but close enough, just testing
-		{
-			if (teste != 'k') // just for testing, oscillate the values on the screen
-				teste = 'k';
-				else
-				teste = 'f';
-				EEPROMTesting(teste);
 		}
 		updateScreen();
 	}
