@@ -45,8 +45,6 @@ file_017=.
 file_018=.
 file_019=.
 file_020=.
-file_021=.
-file_022=.
 [GENERATED_FILES]
 file_000=no
 file_001=no
@@ -69,8 +67,6 @@ file_017=no
 file_018=no
 file_019=no
 file_020=no
-file_021=no
-file_022=no
 [OTHER_FILES]
 file_000=no
 file_001=no
@@ -93,8 +89,6 @@ file_017=no
 file_018=no
 file_019=no
 file_020=no
-file_021=yes
-file_022=yes
 [FILE_INFO]
 file_000=events.c
 file_001=eeprom.c
@@ -117,8 +111,6 @@ file_017=events.h
 file_018=eeprom.h
 file_019=sensors.h
 file_020=C:\mcc18\lkr\18f452i.lkr
-file_021=monitsys.cod
-file_022=monitsys.cof
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
 suite_state=

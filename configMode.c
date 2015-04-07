@@ -3,6 +3,8 @@
 void config()
 {
 	char buffer[3];
+	char changed = 0;
+	time temp;
 
 #ifdef debug
 	TRISBbits.TRISB2 = 0;
@@ -11,7 +13,7 @@ void config()
 	PORTBbits.RB3 = 0;
 #endif
 	//reset the configurable variables
-	alarm.seconds = alarm.minutes = alarm.hours = 0;
+	//alarm.seconds = alarm.minutes = alarm.hours = 0;
 	temperature_treshold = 0;
 	lumus_treshold = 0;
 	while(BusyXLCD());
@@ -19,30 +21,48 @@ void config()
 	switch(configMode)
 	{
 		case 1: // hours
+			changed = 0;
+			temp.hours = -1;
 			while(configMode == 1)
 			{
-				updateClockField(0x00, &alarm.hours, 24);
+				updateClockField(0x00, &temp.hours, 24);
+				if(temp.hours != -1)
+					changed = 1;
 			}
+			if(changed == 1)
+				clock.hours = temp.hours;
 			SetDDRamAddr(0x00);
-			int_to_str(alarm.hours, buffer);
+			int_to_str(clock.hours, buffer);
 			putsXLCD(buffer);
 			break;
 		case 2: // minutes
+			changed = 0;
+			temp.minutes = -1;
 			while(configMode == 2)
 			{
-				updateClockField(0x03, &alarm.minutes, 60);
+				updateClockField(0x03, &temp.minutes, 60);
+				if(temp.minutes != -1)
+					changed = 1;
 			}
+			if(changed == 1)
+				clock.minutes = temp.minutes;
 			SetDDRamAddr(0x03);
-			int_to_str(alarm.minutes, buffer);
+			int_to_str(clock.minutes, buffer);
 			putsXLCD(buffer);
 			break;
 		case 3: // seconds
+			changed = 0;
+			temp.seconds = -1;
 			while(configMode == 3)
 			{
-				updateClockField(0x06, &alarm.seconds, 60);
+				updateClockField(0x06, &temp.seconds, 60);
+				if(temp.seconds != -1)
+					changed = 1;
 			}
+			if(changed == 1)
+				clock.seconds = temp.seconds;
 			SetDDRamAddr(0x06);
-			int_to_str(alarm.seconds, buffer);
+			int_to_str(clock.seconds, buffer);
 			putsXLCD(buffer);
 			break;
 		case 4: // alarm cfg
@@ -151,10 +171,17 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 	else
 		blink = cursorState(0);
 
-		if(blink > 0)
-		{
-			SetDDRamAddr(LCDaddr);
+	if(blink > 0)
+	{
+		SetDDRamAddr(LCDaddr);
+		if(*fielddata != -1)
 			int_to_str(*fielddata, time_buf);
+		else
+		{
+			time_buf[0] = '-';
+			time_buf[1] = '-';
+			time_buf[2] = 0;
+		}
 		putsXLCD(time_buf);
 	}
 	if(blink == 0)
