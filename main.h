@@ -11,6 +11,7 @@
 
 /* ----------- DEFINES ---------------*/
 #define debug
+#define WDT_DISABLED
 
 #ifndef debug
 #define F_CPU 4000	// in kHz

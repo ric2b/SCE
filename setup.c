@@ -1,4 +1,4 @@
-#include "setup.h"
+#include "interrupts.h"
 #include "sensors.h"
 
 void setup(void)
@@ -11,6 +11,9 @@ void setup(void)
   alarm.seconds = 0;
   alarm.minutes = 0;
   alarm.hours   = 0;
+
+  /* disable watchdog in software (can still be set in HW) */
+  WDTCONbits.SWDTEN = 0;
 
   /* ADC init */
   OpenADC(ADC_FOSC_32 & ADC_RIGHT_JUST & ADC_8ANA_0REF, ADC_CH0 & ADC_INT_OFF);

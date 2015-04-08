@@ -34,6 +34,7 @@ volatile char pmon_counter = 0;
 
 void main (void)
 {
+	delayms(1000);
 	setup();
 
 	while(1)
