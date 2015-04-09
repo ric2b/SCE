@@ -5,28 +5,22 @@ void fireTimeAlarm(void)
 {
 	updateTimeAlarm = 0;
 
-	SetDDRamAddr(0x43);
-	putcXLCD('y');
-
-	alarm.seconds--;
-	if(alarm.seconds < 0)
+	if(alarm.seconds == clock.seconds)
 	{
-		alarm.seconds=59;
-		alarm.minutes--;
-		if(alarm.minutes < 0)
+		if(alarm.minutes == clock.minutes)
 		{
-			alarm.minutes=59;
-			alarm.hours--;
-			if (alarm.hours < 0)
+			if (alarm.hours == clock.hours)
 			{
 				alarmMask &= 0b11111011; // disable the alarm
-			/*	SetDDRamAddr(0x43);
-				putcXLCD('Y');
-*/
-				buzzSetup(); // SOUND THE ALARM!!!
-				buzzOpen(244);
-				delayms(2000);
-				buzzKill();
+				SetDDRamAddr(0x09);
+				putcXLCD('A');
+
+				if(buzzTimer == 0)
+				{
+					buzzTimer = TSOM+1;
+					buzzSetup(); // SOUND THE ALARM!!!
+					buzzOpen(244);
+				}
 			}
 		}
 	}

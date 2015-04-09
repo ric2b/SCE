@@ -41,6 +41,7 @@ extern char lumus;
 extern char temp;
 extern char alarmMask;
 extern char sleeping;
+extern char buzzTimer;
 extern int nStored;
 // these variables are changed by ISRs
 extern volatile time clock;

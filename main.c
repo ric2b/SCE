@@ -16,9 +16,10 @@ char temperature_treshold = 99;
 char lumus_treshold = 5;
 char updateLCD = 1;
 char lumus = 0;
-char temp = 0;
+char temp = 0; // temperature, NOT temporary!
 char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled
 char sleeping = 0;
+char buzzTimer = 0;
 int nStored = 0;
 // these variables are changed by ISRs
 volatile char configMode = 0;
@@ -44,6 +45,13 @@ void main (void)
 
 		if(updateTimeAlarm && (alarmMask & 0b00000100))
 			fireTimeAlarm();
+
+		if(buzzTimer != 0)
+		{
+				buzzTimer--;
+				if(buzzTimer == 0)
+					buzzKill();
+		}
 
 		if(!sleeping)
 			updateScreen();
