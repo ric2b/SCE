@@ -67,7 +67,13 @@ void addToEEPROM(int code){
 	// write8BToEEPROM(writePointer, data); pointer isnt ready to use yet
 	writePointer++;
 	if(writePointer >= NREG)
-	{
 		writePointer = 0;
+	else
+		nStored++;
+
+	if(nStored > NREG>>1) //if more than NREG/2 events are stored
+	{
+		SetDDRamAddr(0x47);
+		putcXLCD('M');
 	}
 }
