@@ -133,11 +133,7 @@ void config()
 	// put P from low power mode
 	while(BusyXLCD());
 	SetDDRamAddr(0x09);
-	putcXLCD('A');
-	putcXLCD('T');
-	putcXLCD('L');
-	SetDDRamAddr(0x0f);
-	putcXLCD('P');
+	putrsXLCD("ATL a P");
 
 	while(BusyXLCD());
 
@@ -311,6 +307,11 @@ void config()
 			configModeUpdated = 0; // reset the variable
 			update_seconds = update_minutes = update_hours = 1;
 			clearConfigScreen();
+			if(alarmMask != 0)
+			{
+				SetDDRamAddr(0x0d);
+				putcXLCD('A');
+			}
 			break;
 	}
 	update_seconds = update_minutes = update_hours = 1;
