@@ -56,18 +56,10 @@ void updateScreen(void)
 
 void updateTemp(char * temperature)
 {
-  char temp1, temp2, temp3, temp4;
-
   update_temp = 0;
   while(BusyXLCD());
   SetDDRamAddr(0x40);
   putsXLCD(temperature);
-
-  temp1 = temp;
-  temp2 = temperature_treshold;
-  temp3 = alarmMask;
-  temp4 = alarmMask & 0b00000010;
-
 
   if(temp == temperature_treshold && (alarmMask & 0b00000010))
     fireTempAlarm();
