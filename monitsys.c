@@ -28,7 +28,7 @@ volatile char update_alt = 0;
 volatile char update_a = 0;
 volatile char update_P = 0;
 volatile char update_temp = 1;
-volatile char update_M = 1;
+volatile char update_M = 0;
 volatile char update_lumus = 1;
 volatile char pmon_counter = 0;
 

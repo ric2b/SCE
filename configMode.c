@@ -100,6 +100,18 @@ char alarmONOFF(char alarmID, char character, char LCDaddr)
 	return 0;
 }
 
+void clearConfigScreen( void )
+{
+	SetDDRamAddr(0x09);
+	putcXLCD(' ');
+	putcXLCD(' ');
+	putcXLCD(' ');
+	SetDDRamAddr(0x0d);
+	putcXLCD(' ');
+	SetDDRamAddr(0x0f);
+	putcXLCD(' ');
+}
+
 void config()
 {
 	char buffer[3];
@@ -120,6 +132,10 @@ void config()
 
 	// put P from low power mode
 	while(BusyXLCD());
+	SetDDRamAddr(0x09);
+	putcXLCD('A');
+	putcXLCD('T');
+	putcXLCD('L');
 	SetDDRamAddr(0x0f);
 	putcXLCD('P');
 
@@ -294,13 +310,9 @@ void config()
 			configMode = 0;
 			configModeUpdated = 0; // reset the variable
 			update_seconds = update_minutes = update_hours = 1;
+			clearConfigScreen();
 			break;
 	}
 	update_seconds = update_minutes = update_hours = 1;
 	updateLCD = 1;
-}
-
-void clearConfigScreen( void )
-{
-
 }
