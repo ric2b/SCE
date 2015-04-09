@@ -7,17 +7,18 @@
 #include "sensors.h"
 #include "configMode.h"
 #include "buzzer.h"
+#include "alarms.h"
 
 /* ----------- GLOBALS ---------------*/
 volatile time clock;
 time alarm;
 time * clockToChange = &clock;
-char temperature_treshold = 99;
+char temperature_treshold = 10;
 char lumus_treshold = 5;
 char updateLCD = 1;
 char lumus = 0;
 char temp = 0; // temperature, NOT temporary!
-char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled
+char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled (respectively)
 char sleeping = 0;
 char buzzTimer = 0;
 int nStored = 0;
@@ -41,10 +42,15 @@ void main (void)
 	while(1)
 	{
 		while(configMode)
+		{
 			config();
+		}
 
 		if(updateTimeAlarm && (alarmMask & 0b00000100))
 			fireTimeAlarm();
+
+		if(!sleeping)
+			updateScreen();
 
 		if(buzzTimer != 0)
 		{
@@ -52,9 +58,6 @@ void main (void)
 				if(buzzTimer == 0)
 					buzzKill();
 		}
-
-		if(!sleeping)
-			updateScreen();
 
 		_asm sleep _endasm
 	}

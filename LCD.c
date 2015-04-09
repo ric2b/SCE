@@ -1,4 +1,5 @@
 #include "LCD.h"
+#include "alarms.h"
 
 void updateScreen(void)
 {
@@ -47,15 +48,29 @@ void updateScreen(void)
     adc_result = ReadADC() >> 6;  //get ADC result
     lumus = adc_result/204;
     putcXLCD(lumus+'0');  // will be on [0,5]
+
+    if(lumus == lumus_treshold && (alarmMask & 0b00000001))
+      fireLumusAlarm();
   }
 }
 
 void updateTemp(char * temperature)
 {
+  char temp1, temp2, temp3, temp4;
+
   update_temp = 0;
   while(BusyXLCD());
   SetDDRamAddr(0x40);
   putsXLCD(temperature);
+
+  temp1 = temp;
+  temp2 = temperature_treshold;
+  temp3 = alarmMask;
+  temp4 = alarmMask & 0b00000010;
+
+
+  if(temp == temperature_treshold && (alarmMask & 0b00000010))
+    fireTempAlarm();
 }
 
 void updateClock(time LCDtime, char * buffer)
