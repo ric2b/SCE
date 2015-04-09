@@ -50,6 +50,8 @@ void t1_isr (void)
 		update_temp = update_lumus = 1;
 	}
 
+	updateTimeAlarm = 1;
+
 	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
 }
 

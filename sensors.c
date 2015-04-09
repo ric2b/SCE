@@ -1,4 +1,36 @@
 #include "sensors.h"
+#include "buzzer.h"
+
+void fireTimeAlarm(void)
+{
+	updateTimeAlarm = 0;
+
+	SetDDRamAddr(0x43);
+	putcXLCD('y');
+
+	alarm.seconds--;
+	if(alarm.seconds < 0)
+	{
+		alarm.seconds=59;
+		alarm.minutes--;
+		if(alarm.minutes < 0)
+		{
+			alarm.minutes=59;
+			alarm.hours--;
+			if (alarm.hours < 0)
+			{
+				alarmMask &= 0b11111011; // disable the alarm
+			/*	SetDDRamAddr(0x43);
+				putcXLCD('Y');
+*/
+				buzzSetup(); // SOUND THE ALARM!!!
+				buzzOpen(244);
+				delayms(2000);
+				buzzKill();
+			}
+		}
+	}
+}
 
 void readTemperature(char * temperature)
 {

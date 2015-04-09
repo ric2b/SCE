@@ -5,9 +5,9 @@
 #define F_BUZZ_INC	25
 #define BUZZ_DUTY 0.5
 
-void buzzSetup();
+void buzzSetup(void);
 void buzzOpen(unsigned freq);
-void buzzKill();
-void buzzTest();
+void buzzKill(void);
+void buzzTest(void);
 
 #endif

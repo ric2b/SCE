@@ -253,7 +253,6 @@ void config()
 
 				if(changeValueWithS2(&blink)) //ignore blink
 				{
-					update_P = 1;
 					configMode = 0;
 					configModeUpdated = 0;
 					while(BusyXLCD());

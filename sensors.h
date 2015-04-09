@@ -10,6 +10,7 @@
 #define RTR (0x00)    // TC74 command - read temperature
 #define RWCR (0x01)    // TC74 command - read/write (config)
 
+void fireTimeAlarm(void);
 void readTemperature(char * temperature);
 
 #endif

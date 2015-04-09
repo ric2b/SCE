@@ -6,6 +6,7 @@
 #include "delays.h"
 #include "sensors.h"
 #include "configMode.h"
+#include "buzzer.h"
 
 /* ----------- GLOBALS ---------------*/
 volatile time clock;
@@ -26,12 +27,10 @@ volatile char update_hours = 1;
 volatile char update_minutes = 1;
 volatile char update_seconds = 1;
 volatile char update_alt = 0;
-volatile char update_a = 0;
-volatile char update_P = 0;
 volatile char update_temp = 1;
-volatile char update_M = 0;
 volatile char update_lumus = 1;
 volatile char pmon_counter = 0;
+volatile char updateTimeAlarm = 0;
 
 void main (void)
 {
@@ -41,15 +40,13 @@ void main (void)
 	while(1)
 	{
 		while(configMode)
-		{
-			//setupConfigLCD();
 			config();
-		}
+
+		if(updateTimeAlarm && (alarmMask & 0b00000100))
+			fireTimeAlarm();
 
 		if(!sleeping)
-		{
 			updateScreen();
-		}
 
 		_asm sleep _endasm
 	}

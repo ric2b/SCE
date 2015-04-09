@@ -50,12 +50,10 @@ extern volatile char update_hours;
 extern volatile char update_minutes;
 extern volatile char update_seconds;
 extern volatile char update_alt;
-extern volatile char update_a;
-extern volatile char update_P;
 extern volatile char update_temp;
-extern volatile char update_M;
 extern volatile char update_lumus;
 extern volatile char pmon_counter;
+extern volatile char updateTimeAlarm;
 
 /* ----------- FUNCTIONS ---------------*/
 void int_to_str(int raw, char *str);

@@ -23,32 +23,10 @@ void updateScreen(void)
     putrsXLCD("ATL");
   }
 
-  if(update_a)
-  {
-    update_a = 0;
-    SetDDRamAddr(0x0d);
-    putcXLCD('a');
-  }
-
-  if(update_P)
-  {
-    update_P = 0;
-    SetDDRamAddr(0x0f);
-    putcXLCD('P');
-  }
-
   if(update_temp)
   {
     readTemperature(buffer);
     updateTemp(buffer);
-  }
-
-  if(update_M)
-  {
-    update_M = 0;
-    while(BusyXLCD());
-    SetDDRamAddr(0x47);
-    putcXLCD('M');
   }
 
 #ifdef debug
