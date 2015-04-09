@@ -44,7 +44,10 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 		*fielddata %= modulos;
 		SetDDRamAddr(LCDaddr);
 		int_to_str(*fielddata, time_buf);
-		putsXLCD(time_buf);
+		if(configMode == 9) // Lumus config
+			putcXLCD(time_buf[1]);
+		else
+			putsXLCD(time_buf);
 		blink = cursorState(1); // ignore next second update
 	}
 	else
@@ -61,7 +64,11 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 			time_buf[1] = '-';
 			time_buf[2] = 0;
 		}
-		putsXLCD(time_buf);
+
+		if(configMode == 9)
+			putcXLCD(time_buf[1]);
+		else
+			putsXLCD(time_buf);
 	}
 	else if(blink == 0)
 	{
@@ -69,7 +76,11 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 		time_buf[0] = ' ';
 		time_buf[1] = ' ';
 		time_buf[2] = 0;
-		putsXLCD(time_buf);
+
+		if(configMode == 9)
+			putcXLCD(time_buf[1]);
+		else
+			putsXLCD(time_buf);
 	}
 }
 
@@ -282,12 +293,7 @@ void config()
 			blink = -1;
 			while(configMode == 9)
 			{
-				updateClockField(0x4e, &blink, 6);
-				if(cursorState(0) != -1) // UGLY HACKINESS, PLEASE CHANGE
-				{
-					SetDDRamAddr(0x4e);
-					putcXLCD(' ');
-				}
+				updateClockField(0x4f, &blink, 6);
 				if(blink != -1)
 					changed = 1;
 			}
