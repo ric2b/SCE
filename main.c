@@ -33,7 +33,6 @@ volatile char configModeUpdated = 0;
 volatile char update_hours = 1;
 volatile char update_minutes = 1;
 volatile char update_seconds = 1;
-volatile char update_alt = 0;
 volatile char update_temp = 1;
 volatile char update_lumus = 1;
 volatile char pmon_counter = 0;
@@ -66,7 +65,7 @@ void main (void)
 		if(updateTimeAlarm && (alarmMask & 0b00000100))
 			fireTimeAlarm();
 
-		if(!sleeping)
+		if(!sleeping || (alarmMask != 0 && (update_temp || update_lumus)))
 			updateScreen();
 
 		if(buzzTimer != 0)

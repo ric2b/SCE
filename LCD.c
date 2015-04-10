@@ -1,3 +1,5 @@
+#include <xlcd.h>
+#include "sensors.h"
 #include "LCD.h"
 #include "alarms.h"
 
@@ -9,19 +11,15 @@ void updateScreen(void)
   int adc_result = 0;
 
   // awake LCD
-  while(BusyXLCD());
-  WriteCmdXLCD(CURSOR_OFF);
+  if(!sleeping)
+  {
+    while(BusyXLCD());
+    WriteCmdXLCD(CURSOR_OFF);
+  }
 
   if(update_seconds & !configModeUpdated)
   {
     updateClock(clock, buffer);
-  }
-
-  if(update_alt)
-  {
-    update_alt = 0;
-    SetDDRamAddr(0x09);
-    putrsXLCD("ATL");
   }
 
   if(update_temp)
@@ -29,15 +27,6 @@ void updateScreen(void)
     readTemperature(buffer);
     updateTemp(buffer);
   }
-
-#ifdef debug
-  if(configMode)
-  {
-    while(BusyXLCD());
-    SetDDRamAddr(0x49);
-    putcXLCD('C');
-  }
-#endif
 
   if(update_lumus)
   {

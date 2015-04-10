@@ -142,7 +142,7 @@ void config()
 	// put P from low power mode
 	while(BusyXLCD());
 	SetDDRamAddr(0x09);
-	putrsXLCD("ATL a P");
+	putrsXLCD((const far rom char *)"ATL a P");
 
 	while(BusyXLCD());
 
@@ -227,7 +227,12 @@ void config()
 
 			while(configMode == 5)
 			{
-				alarmONOFF(1, 'T', 0x0A);
+				if(alarmONOFF(1, 'T', 0x0A))
+				{
+					SetDDRamAddr(0x0A);
+					putcXLCD('T');
+					configMode = 8;
+				}
 			}
 			SetDDRamAddr(0x0A);
 			putcXLCD('T');
@@ -244,7 +249,12 @@ void config()
 
 			while(configMode == 6)
 			{
-				alarmONOFF(2, 'L', 0x0B);
+				if(alarmONOFF(2, 'L', 0x0B))
+				{
+					SetDDRamAddr(0x0B);
+					putcXLCD('L');
+					configMode = 9;
+				}
 			}
 			SetDDRamAddr(0x0B);
 			putcXLCD('L');
@@ -270,6 +280,7 @@ void config()
 					_asm sleep _endasm
 				}
 			}
+			configMode = 10; // goes to Default, to exit
 			break;
 
 		case 8: // temperature threshold
@@ -286,6 +297,7 @@ void config()
 			SetDDRamAddr(0x40);
 			readTemperature(buffer);
 			updateTemp(buffer);
+			configMode = 6;
 			break;
 
 		case 9: // lumos threshold
@@ -303,6 +315,7 @@ void config()
 			putcXLCD(' ');
 			ConvertADC();
 			putcXLCD((ReadADC() >> 6)/204+'0');
+			configMode = 7;
 			break;
 
 		default:
