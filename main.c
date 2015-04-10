@@ -44,7 +44,7 @@ void main (void)
 	delayms(1000);
 	setup();
 
-	/* TESTE DA EEPROM */
+	/* TESTE DA EEPROM
 	writeUpdate();
 	readUpdate();
 	NREGUpdate();
@@ -53,7 +53,7 @@ void main (void)
 	for(i = 1; i<40; i++){
 		addToEEPROM(10);
 	}
-	/* END OF TEST */
+	 END OF TEST */
 
 	while(1)
 	{
