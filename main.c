@@ -49,7 +49,7 @@ void main (void)
 		if(updateTimeAlarm && (alarmMask & 0b00000100))
 			fireTimeAlarm();
 
-		if(!sleeping)
+		if(!sleeping || (alarmMask != 0 && (update_temp || update_lumus)))
 			updateScreen();
 
 		if(buzzTimer != 0)
