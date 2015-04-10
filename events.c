@@ -5,6 +5,7 @@
 
 void addToEEPROM(int code){
 	char data[8];
+	int varNREG = NREG;
 	switch(code)
 	{
 		case 1:
@@ -57,7 +58,6 @@ void addToEEPROM(int code){
 			data[7]=0;
 			break;
 		default:
-		/*
 			data[0]=clock.hours;
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
@@ -65,7 +65,8 @@ void addToEEPROM(int code){
 			data[4]=temp;
 			data[5]=lumus;
 			data[6]=0;
-			data[7]=0;*/
+			data[7]=0;
+			/* FOR TESTING ONLY
 			data[0]='h';
 			data[1]='e';
 			data[2]='l';
@@ -74,12 +75,13 @@ void addToEEPROM(int code){
 			data[5]='w';
 			data[6]='o';
 			data[7]='r';
+			*/
 			break;
 	}
 
 	write8BToEEPROM(writerPointer, data);
 	writerPointer+=8;
-	if(writerPointer >= (NREG*8))
+	if(writerPointer >= (varNREG << 3))
 		writerPointer = 0;
 	else
 		numberEvents++;
