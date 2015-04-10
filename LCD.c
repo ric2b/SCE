@@ -1,3 +1,5 @@
+#include <xlcd.h>
+#include "sensors.h"
 #include "LCD.h"
 #include "alarms.h"
 
@@ -15,13 +17,6 @@ void updateScreen(void)
   if(update_seconds & !configModeUpdated)
   {
     updateClock(clock, buffer);
-  }
-
-  if(update_alt)
-  {
-    update_alt = 0;
-    SetDDRamAddr(0x09);
-    putrsXLCD("ATL");
   }
 
   if(update_temp)

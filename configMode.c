@@ -142,7 +142,7 @@ void config()
 	// put P from low power mode
 	while(BusyXLCD());
 	SetDDRamAddr(0x09);
-	putrsXLCD("ATL a P");
+	putrsXLCD((const far rom char *)"ATL a P");
 
 	while(BusyXLCD());
 

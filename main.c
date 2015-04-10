@@ -28,7 +28,6 @@ volatile char configModeUpdated = 0;
 volatile char update_hours = 1;
 volatile char update_minutes = 1;
 volatile char update_seconds = 1;
-volatile char update_alt = 0;
 volatile char update_temp = 1;
 volatile char update_lumus = 1;
 volatile char pmon_counter = 0;
