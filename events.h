@@ -3,9 +3,10 @@
 
 #include "main.h"
 
-short int readPointer;
-short int writePointer;
-
 void addToEEPROM(int code);
+void writeUpdate(void);
+void readUpdate(void);
+void NREGUpdate(void);
+void usedUpdate(void);
 
 #endif

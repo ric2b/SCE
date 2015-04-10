@@ -1,4 +1,7 @@
 #include "events.h"
+#include "eeprom.h"
+#include "main.h"
+
 
 void addToEEPROM(int code){
 	char data[8];
@@ -54,6 +57,7 @@ void addToEEPROM(int code){
 			data[7]=0;
 			break;
 		default:
+		/*
 			data[0]=clock.hours;
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
@@ -61,19 +65,45 @@ void addToEEPROM(int code){
 			data[4]=temp;
 			data[5]=lumus;
 			data[6]=0;
-			data[7]=0;
+			data[7]=0;*/
+			data[0]='h';
+			data[1]='e';
+			data[2]='l';
+			data[3]='l';
+			data[4]='o';
+			data[5]='w';
+			data[6]='o';
+			data[7]='r';
 			break;
 	}
-	// write8BToEEPROM(writePointer, data); pointer isnt ready to use yet
-	writePointer++;
-	if(writePointer >= NREG)
-		writePointer = 0;
-	else
-		nStored++;
 
-	if(nStored > NREG>>1) //if more than NREG/2 events are stored
+	write8BToEEPROM(writerPointer, data);
+	writerPointer+=8;
+	if(writerPointer >= (NREG*8))
+		writerPointer = 0;
+	else
+		numberEvents++;
+
+	if(numberEvents > NREG>>1) //if more than NREG/2 events are stored
 	{
 		SetDDRamAddr(0x47);
 		putcXLCD('M');
 	}
+}
+
+void writeUpdate(void){
+	writeToEEPROM(writerEEPROM, (writerPointer & 0xFF00) >> 8);
+	writeToEEPROM(writerEEPROM+1, writerPointer & 0x00FF);
+}
+void readUpdate(void){
+	writeToEEPROM(readerEEPROM, (readerPointer & 0xFF00) >> 8);
+	writeToEEPROM(readerEEPROM+1, readerPointer & 0x00FF);
+}
+void NREGUpdate(void){
+	writeToEEPROM(NREGEEPROM, (NREG & 0xFF00) >> 8);
+	writeToEEPROM(NREGEEPROM+1, NREG & 0x00FF);
+}
+void usedUpdate(void){
+	writeToEEPROM(usedEEPROM, (numberEvents & 0xFF00) >> 8);
+	writeToEEPROM(usedEEPROM+1, numberEvents & 0x00FF);
 }

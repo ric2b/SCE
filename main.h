@@ -23,6 +23,11 @@
 #define TSOM 2
 #define NREG 30
 
+#define writerEEPROM 0x7FF8
+#define readerEEPROM 0x7FFA
+#define NREGEEPROM 0x7FFC
+#define usedEEPROM 0x7FFE
+
 /* ----------- STRUCTS ---------------*/
 typedef struct time
 {
@@ -42,7 +47,6 @@ extern char temp;
 extern char alarmMask;
 extern char sleeping;
 extern char buzzTimer;
-extern int nStored;
 // these variables are changed by ISRs
 extern volatile time clock;
 extern volatile char configMode;
@@ -56,6 +60,10 @@ extern volatile char update_lumus;
 extern volatile char pmon_counter;
 extern volatile char updateTimeAlarm;
 
+/*----- EEPROM VARIABLES ---------------*/
+extern short int writerPointer;
+extern short int readerPointer;
+extern short int numberEvents;
 /* ----------- FUNCTIONS ---------------*/
 void int_to_str(int raw, char *str);
 

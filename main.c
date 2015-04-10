@@ -1,6 +1,7 @@
 #include "main.h"
 #include "setup.h"
 #include "eeprom.h"
+#include "events.h"
 #include "LCD.h"
 #include "interrupts.h"
 #include "delays.h"
@@ -21,7 +22,11 @@ char temp = 0; // temperature, NOT temporary!
 char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled (respectively)
 char sleeping = 0;
 char buzzTimer = 0;
-int nStored = 0;
+
+short int writerPointer=0;
+short int readerPointer=0;
+short int numberEvents=0;
+
 // these variables are changed by ISRs
 volatile char configMode = 0;
 volatile char configModeUpdated = 0;
@@ -36,8 +41,20 @@ volatile char updateTimeAlarm = 0;
 
 void main (void)
 {
+	int i;
 	delayms(1000);
 	setup();
+
+	/* TESTE DA EEPROM */
+	writeUpdate();
+	readUpdate();
+	NREGUpdate();
+	usedUpdate();
+
+	for(i = 1; i<40; i++){
+		addToEEPROM(10);
+	}
+	/* END OF TEST */
 
 	while(1)
 	{
