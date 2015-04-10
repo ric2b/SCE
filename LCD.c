@@ -11,8 +11,11 @@ void updateScreen(void)
   int adc_result = 0;
 
   // awake LCD
-  while(BusyXLCD());
-  WriteCmdXLCD(CURSOR_OFF);
+  if(!sleeping)
+  {
+    while(BusyXLCD());
+    WriteCmdXLCD(CURSOR_OFF);
+  }
 
   if(update_seconds & !configModeUpdated)
   {
@@ -24,15 +27,6 @@ void updateScreen(void)
     readTemperature(buffer);
     updateTemp(buffer);
   }
-
-#ifdef debug
-  if(configMode)
-  {
-    while(BusyXLCD());
-    SetDDRamAddr(0x49);
-    putcXLCD('C');
-  }
-#endif
 
   if(update_lumus)
   {

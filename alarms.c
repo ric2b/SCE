@@ -12,6 +12,10 @@ void fireTimeAlarm(void)
 			if (alarm.hours == clock.hours)
 			{
 				alarmMask &= 0b11111011; // disable the alarm
+
+				sleeping = 0;
+				while(BusyXLCD());
+				WriteCmdXLCD(CURSOR_OFF);
 				SetDDRamAddr(0x09);
 				putcXLCD('A');
 
@@ -30,6 +34,9 @@ void fireTempAlarm(void)
 {
 	alarmMask &= 0b11111101;
 
+	sleeping = 0;
+	while(BusyXLCD());
+	WriteCmdXLCD(CURSOR_OFF);
 	SetDDRamAddr(0x0A);
 	putcXLCD('T');
 
@@ -42,6 +49,9 @@ void fireLumusAlarm(void)
 {
 	alarmMask &= 0b11111110;
 
+	sleeping = 0;
+	while(BusyXLCD());
+	WriteCmdXLCD(CURSOR_OFF);
 	SetDDRamAddr(0x0B);
 	putcXLCD('L');
 
