@@ -62,11 +62,11 @@ void t1_isr (void)
 void phoenix_isr(void)
 {
 
+	PIR2bits.LVDIF = 0;         /* clear flag to avoid another interrupt */
 }
 
 void S3_isr (void)
 {
-	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
 	if(sleeping == 1)
 	{
 		sleeping = 0;
@@ -76,6 +76,8 @@ void S3_isr (void)
 		configMode++;
 		configModeUpdated = 1;
 	}
+
+	INTCONbits.INT0IF = 0;	/* clear flag to avoid another interrupt. The INT0 external interrupt did not occur */
 }
 
 void EnableHighInterrupts (void)

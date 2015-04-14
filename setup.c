@@ -33,6 +33,15 @@ void setup(void)
   TRISBbits.TRISB0 = 1;
   OpenRB0INT(PORTB_CHANGE_INT_ON & FALLING_EDGE_INT & PORTB_PULLUPS_OFF);
 
+  /* enable low voltage detection (LVD) interrupt */
+  PIE2bits.LVDIE = 0;         /* disable LVD interrupt */
+  LVDCON = 0b1110;            /* 4.5 V - 4.77 V */
+  LVDCONbits.LVDEN = 1;       /* enable LVD */
+  while(!LVDCONbits.IRVST);   /* wait initialization .Internal Reference Voltage Stable Flag bit. 1 = Indicates that the Low Voltage Detect logic will generate the interrupt flag at the specified voltage range */
+  PIR2bits.LVDIF = 0;         /* clear interrupt flag */
+  PIE2bits.LVDIE = 1;         /* enable LVD interrupt */
+
+  /* interrupts enabled */
   EnableHighInterrupts();
 
   WriteTimer1(0x8000); // load timer: 1 second
