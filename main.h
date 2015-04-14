@@ -46,7 +46,8 @@ extern char lumus;
 extern char temp;
 extern char alarmMask;
 extern char sleeping;
-extern char buzzTimer;
+extern char temp_last;
+extern char lumus_last;
 // these variables are changed by ISRs
 extern volatile time clock;
 extern volatile char configMode;
@@ -59,6 +60,7 @@ extern volatile char update_temp;
 extern volatile char update_lumus;
 extern volatile char pmon_counter;
 extern volatile char updateTimeAlarm;
+extern volatile char buzzTimer;
 
 /*----- EEPROM VARIABLES ---------------*/
 extern short int writerPointer;

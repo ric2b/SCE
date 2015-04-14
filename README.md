@@ -19,3 +19,10 @@ the buffer to the interrupt structure from pin RB0 is a Schmitt Trigger, which r
 
 The Timer1 oscillator allows the counter to operate (increment) when the device is in sleep mode. This allows Timer1 to be used as a real-time clock.
 
+
+#On the LCD - HD44780U
+
+- http://elm-chan.org/docs/lcd/hd44780_e.html
+- http://web.alfredstate.edu/weimandn/lcd/lcd_initialization/lcd_initialization_index.html
+- https://code.google.com/p/the-bus-pirate/source/browse/trunk/source/HD44780.c
+- http://forum.arduino.cc/index.php/topic,46376.0.html

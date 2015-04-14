@@ -2,6 +2,7 @@
 #include "sensors.h"
 #include "LCD.h"
 #include "delays.h"
+#include "events.h"
 
 char cursorState( char ignore )
 { // use TMR1L TMR1H to get shorter time scales
@@ -103,10 +104,18 @@ char alarmONOFF(char alarmID, char character, char LCDaddr)
 		if(alarmMask & (0b00000100 >> alarmID))
 		{
 			putcXLCD('A');
+
+			if( PMON != 0 )
+				addToEEPROM(6); // Activate/Disable alarm, this goes into EEPROM as a event. 6 is the code for that
+
 			return 1; // if the user pressed the button and the new status is ACTIVE
 		}
 		else
+		{
 			putcXLCD('a');
+			if ( PMON != 0 )
+			 addToEEPROM(6); // Activate/Disable alarm, this goes into EEPROM as a event. 6 is the code for that
+		}
 	}
 	return 0;
 }
@@ -130,12 +139,6 @@ void config()
 	char blink;
 	time temp;
 
-#ifdef debug
-	TRISBbits.TRISB2 = 0;
-	TRISBbits.TRISB3 = 0;
-	PORTBbits.RB2 = 1;
-	PORTBbits.RB3 = 0;
-#endif
 	//reset the configurable variables
 	//alarm.seconds = alarm.minutes = alarm.hours = 0;
 

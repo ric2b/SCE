@@ -15,6 +15,8 @@ void chooseInterrupt(void)
 {
 	if(PIR1bits.TMR1IF)
 		t1_isr();
+	if(PIR2bits.LVDIF)
+		phoenix_isr();	// LVD detect, so that the program can rise from the ashes
 	if(INTCONbits.INT0IF)
 		S3_isr();
 }
@@ -51,8 +53,15 @@ void t1_isr (void)
 	}
 
 	updateTimeAlarm = 1;
+	if(buzzTimer > 0)
+		buzzTimer--;	
 
 	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
+}
+
+void phoenix_isr(void)
+{
+
 }
 
 void S3_isr (void)

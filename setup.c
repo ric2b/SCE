@@ -27,7 +27,7 @@ void setup(void)
       T1_SOURCE_EXT  &
       T1_PS_1_1      &
       T1_OSC1EN_ON   &
-      T1_SYNC_EXT_ON );
+      T1_SYNC_EXT_OFF );
 
   /* enable external interrupt on pin RB0/INT0 */
   TRISBbits.TRISB0 = 1;

@@ -18,10 +18,11 @@ char temperature_treshold = 10;
 char lumus_treshold = 5;
 char updateLCD = 1;
 char lumus = 0;
+char lumus_last = 0;
+char temp_last = 0;
 char temp = 0; // temperature, NOT temporary!
 char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled (respectively)
 char sleeping = 0;
-char buzzTimer = 0;
 
 short int writerPointer=0;
 short int readerPointer=0;
@@ -37,6 +38,7 @@ volatile char update_temp = 1;
 volatile char update_lumus = 1;
 volatile char pmon_counter = 0;
 volatile char updateTimeAlarm = 0;
+volatile char buzzTimer = 0;
 
 void main (void)
 {
@@ -44,16 +46,8 @@ void main (void)
 	delayms(1000);
 	setup();
 
-	/* TESTE DA EEPROM
-	writeUpdate();
-	readUpdate();
-	NREGUpdate();
-	usedUpdate();
-
-	for(i = 1; i<40; i++){
-		addToEEPROM(10);
-	}
-	 END OF TEST */
+	if( PMON != 0)
+		addToEEPROM(1); // Execution begins! 1 stands for that
 
 	while(1)
 	{
@@ -68,14 +62,11 @@ void main (void)
 		if(!sleeping || (alarmMask != 0 && (update_temp || update_lumus)))
 			updateScreen();
 
-		if(buzzTimer != 0)
+		if(buzzTimer == 0)
 		{
-				buzzTimer--;
-				if(buzzTimer == 0)
-					buzzKill();
+			buzzKill();
+			Sleep();	// cannot sleep while buzzer should be on
 		}
-
-		_asm sleep _endasm
 	}
 }
 

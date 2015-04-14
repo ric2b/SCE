@@ -1,5 +1,6 @@
 #include "main.h"
 #include "buzzer.h"
+#include "events.h"
 
 void fireTimeAlarm(void)
 {
@@ -11,7 +12,7 @@ void fireTimeAlarm(void)
 		{
 			if (alarm.hours == clock.hours)
 			{
-				alarmMask &= 0b11111011; // disable the alarm
+				//alarmMask &= 0b11111011; // disable the alarm
 
 				sleeping = 0;
 				while(BusyXLCD());
@@ -24,7 +25,11 @@ void fireTimeAlarm(void)
 					buzzTimer = TSOM+1;
 					buzzSetup(); // SOUND THE ALARM!!!
 					buzzOpen(244);
+
+					if ( PMON != 0)
+						addToEEPROM(7); // WRITE THE ALARM!!! 7 stands for time alarm going off
 				}
+
 			}
 		}
 	}
@@ -32,7 +37,7 @@ void fireTimeAlarm(void)
 
 void fireTempAlarm(void)
 {
-	alarmMask &= 0b11111101;
+//	alarmMask &= 0b11111101;
 
 	sleeping = 0;
 	while(BusyXLCD());
@@ -43,11 +48,14 @@ void fireTempAlarm(void)
 	buzzTimer = TSOM+1;
 	buzzSetup(); // SOUND THE ALARM!!!
 	buzzOpen(732);
+
+	if(PMON != 0)
+		addToEEPROM(8); // WRITE THE ALARM!!! 8 stands for temperature alarm going off
 }
 
 void fireLumusAlarm(void)
 {
-	alarmMask &= 0b11111110;
+//	alarmMask &= 0b11111110;
 
 	sleeping = 0;
 	while(BusyXLCD());
@@ -58,4 +66,7 @@ void fireLumusAlarm(void)
 	buzzTimer = TSOM+1;
 	buzzSetup(); // SOUND THE ALARM!!!
 	buzzOpen(488);
+
+	if(PMON != 0)
+		addToEEPROM(9); // WRITE THE ALARM!!! 9 stands for lumus alarm going off
 }

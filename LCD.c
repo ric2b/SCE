@@ -38,20 +38,35 @@ void updateScreen(void)
     lumus = adc_result/204;
     putcXLCD(lumus+'0');  // will be on [0,5]
 
-    if(lumus == lumus_treshold && (alarmMask & 0b00000001))
-      fireLumusAlarm();
+	if( ( (lumus_last < lumus_treshold && lumus > lumus_treshold) ||
+				( lumus_last > lumus_treshold && lumus < lumus_treshold) ) && (alarmMask & 0b00000001) )
+	{
+		fireLumusAlarm();
+	}
+	if( lumus != lumus_treshold )
+	{
+		lumus_last = lumus;
+	}
   }
 }
 
 void updateTemp(char * temperature)
 {
-  update_temp = 0;
-  while(BusyXLCD());
-  SetDDRamAddr(0x40);
-  putsXLCD(temperature);
+	update_temp = 0;
+	while(BusyXLCD());
+	SetDDRamAddr(0x40);
+	putsXLCD(temperature);
 
-  if(temp == temperature_treshold && (alarmMask & 0b00000010))
-    fireTempAlarm();
+	if( ( (temp_last < temperature_treshold && temp > temperature_treshold) ||
+				( temp_last > temperature_treshold && temp < temperature_treshold) ) && (alarmMask & 0b00000010) )
+	{
+		fireTempAlarm();
+	}
+	if( temp != temperature_treshold )
+	{
+		temp_last = temp;
+	}
+
 }
 
 void updateClock(time LCDtime, char * buffer)
