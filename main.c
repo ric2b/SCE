@@ -43,8 +43,9 @@ void main (void)
 	int i;
 	delayms(1000);
 	setup();
-
-	addToEEPROM(1); // Execution begins! 1 stands for that
+	
+	if( PMON != 0)
+		addToEEPROM(1); // Execution begins! 1 stands for that
 
 	while(1)
 	{
