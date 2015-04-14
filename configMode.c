@@ -2,6 +2,7 @@
 #include "sensors.h"
 #include "LCD.h"
 #include "delays.h"
+#include "events.h"
 
 char cursorState( char ignore )
 { // use TMR1L TMR1H to get shorter time scales

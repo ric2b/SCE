@@ -1,5 +1,6 @@
 #include "main.h"
 #include "buzzer.h"
+#include "events.h"
 
 void fireTimeAlarm(void)
 {
@@ -65,7 +66,7 @@ void fireLumusAlarm(void)
 	buzzTimer = TSOM+1;
 	buzzSetup(); // SOUND THE ALARM!!!
 	buzzOpen(488);
-	
+
 	if(PMON != 0)
 		addToEEPROM(9); // WRITE THE ALARM!!! 9 stands for lumus alarm going off
 }
