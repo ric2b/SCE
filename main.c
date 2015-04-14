@@ -44,16 +44,7 @@ void main (void)
 	delayms(1000);
 	setup();
 
-	/* TESTE DA EEPROM
-	writeUpdate();
-	readUpdate();
-	NREGUpdate();
-	usedUpdate();
-
-	for(i = 1; i<40; i++){
-		addToEEPROM(10);
-	}
-	 END OF TEST */
+	addToEEPROM(1); // Execution begins! 1 stands for that
 
 	while(1)
 	{

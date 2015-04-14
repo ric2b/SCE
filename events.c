@@ -2,7 +2,6 @@
 #include "eeprom.h"
 #include "main.h"
 
-
 void addToEEPROM(int code){
 	char data[8];
 	int varNREG = NREG;

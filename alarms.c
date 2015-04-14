@@ -24,7 +24,9 @@ void fireTimeAlarm(void)
 					buzzTimer = TSOM+1;
 					buzzSetup(); // SOUND THE ALARM!!!
 					buzzOpen(244);
+					addToEEPROM(7); // WRITE THE ALARM!!! 7 stands for time alarm going off
 				}
+
 			}
 		}
 	}
@@ -43,6 +45,8 @@ void fireTempAlarm(void)
 	buzzTimer = TSOM+1;
 	buzzSetup(); // SOUND THE ALARM!!!
 	buzzOpen(732);
+
+	addToEEPROM(8); // WRITE THE ALARM!!! 8 stands for temperature alarm going off
 }
 
 void fireLumusAlarm(void)
@@ -58,4 +62,6 @@ void fireLumusAlarm(void)
 	buzzTimer = TSOM+1;
 	buzzSetup(); // SOUND THE ALARM!!!
 	buzzOpen(488);
+
+	addToEEPROM(9); // WRITE THE ALARM!!! 9 stands for lumus alarm going off
 }

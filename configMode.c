@@ -103,10 +103,14 @@ char alarmONOFF(char alarmID, char character, char LCDaddr)
 		if(alarmMask & (0b00000100 >> alarmID))
 		{
 			putcXLCD('A');
+			addToEEPROM(6); // Activate/Disable alarm, this goes into EEPROM as a event. 6 is the code for that
 			return 1; // if the user pressed the button and the new status is ACTIVE
 		}
 		else
+		{
 			putcXLCD('a');
+			addToEEPROM(6); // Activate/Disable alarm, this goes into EEPROM as a event. 6 is the code for that
+		}
 	}
 	return 0;
 }
