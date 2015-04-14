@@ -22,12 +22,21 @@ void setup(void)
   TRISAbits.TRISA4 = 1;
 
   /* timer */
+  #ifdef proteus
+  OpenTimer1(TIMER_INT_ON   &
+      T1_16BIT_RW    &
+      T1_SOURCE_EXT  &
+      T1_PS_1_1      &
+      T1_OSC1EN_ON   &
+      T1_SYNC_EXT_ON );
+  #else
   OpenTimer1(TIMER_INT_ON   &
       T1_16BIT_RW    &
       T1_SOURCE_EXT  &
       T1_PS_1_1      &
       T1_OSC1EN_ON   &
       T1_SYNC_EXT_OFF );
+  #endif
 
   /* enable external interrupt on pin RB0/INT0 */
   TRISBbits.TRISB0 = 1;
@@ -37,7 +46,7 @@ void setup(void)
   PIE2bits.LVDIE = 0;         /* disable LVD interrupt */
   LVDCON = 0b1110;            /* 4.5 V - 4.77 V */
   LVDCONbits.LVDEN = 1;       /* enable LVD */
-  while(!LVDCONbits.IRVST);   /* wait initialization .Internal Reference Voltage Stable Flag bit. 1 = Indicates that the Low Voltage Detect logic will generate the interrupt flag at the specified voltage range */
+  //while(!LVDCONbits.IRVST);   /* wait initialization .Internal Reference Voltage Stable Flag bit. 1 = Indicates that the Low Voltage Detect logic will generate the interrupt flag at the specified voltage range */
   PIR2bits.LVDIF = 0;         /* clear interrupt flag */
   PIE2bits.LVDIE = 1;         /* enable LVD interrupt */
 
