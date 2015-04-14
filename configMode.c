@@ -138,7 +138,7 @@ void config()
 	char changed = 0;
 	char blink;
 	time temp;
-
+	char update_code_eeprom = 0b00000000;
 	//reset the configurable variables
 	//alarm.seconds = alarm.minutes = alarm.hours = 0;
 
@@ -160,8 +160,10 @@ void config()
 				if(temp.hours != -1)
 					changed = 1;
 			}
-			if(changed == 1)
+			if(changed == 1){
 				clockToChange->hours = temp.hours;
+				update_code_eeprom |= 0b00000001;
+			}
 			SetDDRamAddr(0x00);
 			int_to_str(clockToChange->hours, buffer);
 			putsXLCD(buffer);
@@ -176,8 +178,10 @@ void config()
 				if(temp.minutes != -1)
 					changed = 1;
 			}
-			if(changed == 1)
+			if(changed == 1){
 				clockToChange->minutes = temp.minutes;
+				update_code_eeprom |= 0b00000001;
+			}
 			SetDDRamAddr(0x03);
 			int_to_str(clockToChange->minutes, buffer);
 			putsXLCD(buffer);
@@ -192,8 +196,10 @@ void config()
 				if(temp.seconds != -1)
 					changed = 1;
 			}
-			if(changed == 1)
+			if(changed == 1){
 				clockToChange->seconds = temp.seconds;
+				update_code_eeprom |= 0b00000001;
+			}
 			SetDDRamAddr(0x06);
 			int_to_str(clockToChange->seconds, buffer);
 			putsXLCD(buffer);
@@ -213,6 +219,7 @@ void config()
 				{
 					clockToChange = &alarm;
 					configMode = 1;
+					update_code_eeprom |= 0b00000010;
 				}
 			}
 			SetDDRamAddr(0x09);
@@ -292,8 +299,10 @@ void config()
 			while(configMode == 8)
 			{
 				updateClockField(0x40, &blink, 100);
-				if(blink != -1)
+				if(blink != -1){
 					changed = 1;
+					update_code_eeprom |= 0b00001000;
+				}
 			}
 			if(changed == 1)
 				temperature_treshold = blink;
@@ -309,8 +318,10 @@ void config()
 			while(configMode == 9)
 			{
 				updateClockField(0x4f, &blink, 6);
-				if(blink != -1)
+				if(blink != -1){
 					changed = 1;
+					update_code_eeprom |= 0b00000100;
+				}
 			}
 			if(changed == 1)
 				lumus_treshold = blink;
@@ -335,4 +346,17 @@ void config()
 	}
 	update_seconds = update_minutes = update_hours = 1;
 	updateLCD = 1;
+	// update_code_eeprom, bit 0 = acerto do relogio, bit 1 = set up alarm, bit 2 = set up lumus, bit 3 = set up temp
+	if( ( update_code_eeprom & 0b00000001 ) == 0b00000001 ){
+		addToEEPROM(2);
+	}
+	if( ( update_code_eeprom & 0b00000010 ) == 0b00000010 ){
+		addToEEPROM(3);
+	}
+	if( ( update_code_eeprom & 0b00000100 ) == 0b00000100 ){
+		addToEEPROM(4);
+	}
+	if( ( update_code_eeprom & 0b00001000 ) == 0b00001000 ){
+		addToEEPROM(5);
+	}
 }
