@@ -17,19 +17,12 @@ char cursorState( char ignore )
 
 char changeValueWithS2(char * value)
 {
-	if(PORTAbits.RA4 == 0)
-	{
-		while(PORTAbits.RA4 == 0);
+	static unsigned int state = 0;
 
-		PORTBbits.RB3 = 1; // activa led
+	state = (state<<1) | !PORTAbits.RA4 | 0xe000;
+	if(state == 0xf000)
+	{
 		(*value)++;
-/*		delayms(500);
-		while(PORTAbits.RA4 == 0)
-		{
-			delayms(100);
-			(*value)++;
-		}
-	*/PORTBbits.RB3 = 0;
 		return 1;
 	}
 	return 0;
