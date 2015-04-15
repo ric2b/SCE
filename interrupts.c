@@ -1,5 +1,7 @@
+#include <p18f452.h>  /* for the special function register declarations */
 #include "interrupts.h"
 #include "main.h"
+#include "EEPROMint.h"
 
 // For high interrupts, control is transferred to address 0x8.
 #pragma code HIGH_INTERRUPT_VECTOR = 0x8
@@ -15,6 +17,8 @@ void chooseInterrupt(void)
 {
 	if(PIR1bits.TMR1IF)
 		t1_isr();
+	if(PIR2bits.EEIF)
+		expelliarmus_isr();	// internal eeprom write complete
 	if(PIR2bits.LVDIF)
 		phoenix_isr();	// LVD detect, so that the program can rise from the ashes
 	if(INTCONbits.INT0IF)
@@ -59,9 +63,20 @@ void t1_isr (void)
 	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
 }
 
+void expelliarmus_isr(void)
+{
+	EECON1bits.WREN = 0;	// Disable writes on write complete (EEIF set)
+	PIR2bits.EEIF = 0;		/* clear flag to avoid another interrupt */
+}
+
 void phoenix_isr(void)
 {
-
+	// /!\ change this
+	EEPROMintWrite(0x00, 'A');
+	while(EECON1bits.WR);	// wait for previous write to end
+	EEPROMintWrite(0x07, 'B');
+	while(EECON1bits.WR);
+	EEPROMintWrite(0x07, 'C');
 	PIR2bits.LVDIF = 0;         /* clear flag to avoid another interrupt */
 }
 

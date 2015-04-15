@@ -9,6 +9,7 @@
 #include "configMode.h"
 #include "buzzer.h"
 #include "alarms.h"
+#include "EEPROMint.h"
 
 /* ----------- GLOBALS ---------------*/
 volatile time clock;
@@ -42,11 +43,11 @@ volatile char buzzTimer = 0;
 
 void main (void)
 {
-	int i;
-	delayms(1000);
+	delayms(700);
 	setup();
+	updateScreen();
 
-	if( PMON != 0)
+	if(PMON != 0)
 		addToEEPROM(1); // Execution begins! 1 stands for that
 
 	while(1)
