@@ -3,4 +3,5 @@
 *.err
 *.hex
 *.lst
+*.mcs
 *.o

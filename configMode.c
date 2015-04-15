@@ -192,7 +192,13 @@ void config()
 			if(changed == 1){
 				clockToChange->seconds = temp.seconds;
 				update_code_eeprom |= 0b00000001;
+				if( update_code_eeprom & 0b0000001)
+					addToEEPROM(2);
+				if( update_code_eeprom & 0b0000010)
+					addToEEPROM(3);
 			}
+
+
 			SetDDRamAddr(0x06);
 			int_to_str(clockToChange->seconds, buffer);
 			putsXLCD(buffer);
@@ -294,7 +300,8 @@ void config()
 				updateClockField(0x40, &blink, 100);
 				if(blink != -1){
 					changed = 1;
-					update_code_eeprom |= 0b00001000;
+					//update_code_eeprom |= 0b00001000;
+					addToEEPROM(5);
 				}
 			}
 			if(changed == 1)
@@ -313,7 +320,8 @@ void config()
 				updateClockField(0x4f, &blink, 6);
 				if(blink != -1){
 					changed = 1;
-					update_code_eeprom |= 0b00000100;
+					//update_code_eeprom |= 0b00000100;
+					addToEEPROM(4);
 				}
 			}
 			if(changed == 1)
@@ -340,7 +348,7 @@ void config()
 	update_seconds = update_minutes = update_hours = 1;
 	updateLCD = 1;
 	// update_code_eeprom, bit 0 = acerto do relogio, bit 1 = set up alarm, bit 2 = set up lumus, bit 3 = set up temp
-	if( ( update_code_eeprom & 0b00000001 ) == 0b00000001 ){
+/*	if( ( update_code_eeprom & 0b00000001 ) == 0b00000001 ){
 		addToEEPROM(2);
 	}
 	if( ( update_code_eeprom & 0b00000010 ) == 0b00000010 ){
@@ -351,5 +359,5 @@ void config()
 	}
 	if( ( update_code_eeprom & 0b00001000 ) == 0b00001000 ){
 		addToEEPROM(5);
-	}
+	}*/
 }

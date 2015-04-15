@@ -12,7 +12,7 @@
 /* ----------- DEFINES ---------------*/
 #define debug
 #define WDT_DISABLED
-#define proteus
+//#define proteus
 
 
 #ifndef debug
@@ -23,7 +23,7 @@
 
 #define PMON 5
 #define TSOM 2
-#define NREG 30
+#define NREG 6
 
 #define writerEEPROM 0x7FF8
 #define readerEEPROM 0x7FFA

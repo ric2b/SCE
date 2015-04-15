@@ -47,7 +47,7 @@ void setup(void)
   PIE2bits.LVDIE = 0;         /* disable LVD interrupt */
   LVDCON = 0b1110;            /* 4.5 V - 4.77 V */
   LVDCONbits.LVDEN = 1;       /* enable LVD */
-  #ifndef proteus
+  #ifndef debug
   while(!LVDCONbits.IRVST);   /* wait initialization .Internal Reference Voltage Stable Flag bit. 1 = Indicates that the Low Voltage Detect logic will generate the interrupt flag at the specified voltage range */
   #endif
   PIR2bits.LVDIF = 0;         /* clear interrupt flag */
