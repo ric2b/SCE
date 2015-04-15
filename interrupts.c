@@ -50,7 +50,7 @@ void t1_isr (void)
 	}
 
 	pmon_counter++;
-	if(pmon_counter == PMON)
+	if(pmon_counter >= PMON)
 	{
 		pmon_counter = 0;
 		update_temp = update_lumus = 1;
