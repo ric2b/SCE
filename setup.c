@@ -1,6 +1,8 @@
+//#include <reset.h>
 #include "main.h"
 #include "interrupts.h"
 #include "sensors.h"
+#include "EEPROMint.h"
 
 void setup(void)
 {
@@ -45,13 +47,30 @@ void setup(void)
 
   /* enable low voltage detection (LVD) interrupt */
   PIE2bits.LVDIE = 0;         /* disable LVD interrupt */
-  LVDCON = 0b1110;            /* 4.5 V - 4.77 V */
+  LVDCON = 0b1100;            /* 4.5 V - 4.77 V */
   LVDCONbits.LVDEN = 1;       /* enable LVD */
   #ifndef debug
   while(!LVDCONbits.IRVST);   /* wait initialization .Internal Reference Voltage Stable Flag bit. 1 = Indicates that the Low Voltage Detect logic will generate the interrupt flag at the specified voltage range */
   #endif
   PIR2bits.LVDIF = 0;         /* clear interrupt flag */
   PIE2bits.LVDIE = 1;         /* enable LVD interrupt */
+
+  // check LVD flag
+  if(isLVD())
+  {
+	if((unsigned char) EEPROMintRead(TIME_BAK_ADDR+2) < 60)
+	{
+		clock.hours = EEPROMintRead(TIME_BAK_ADDR);
+		clock.minutes = EEPROMintRead(TIME_BAK_ADDR+1);
+		clock.seconds = EEPROMintRead(TIME_BAK_ADDR+2);
+	}
+
+	while(BusyXLCD());
+	SetDDRamAddr(0x4a);
+	putcXLCD('V');
+  }
+
+
 
   /* interrupts enabled */
   EnableHighInterrupts();
@@ -72,19 +91,12 @@ void setup(void)
   while(BusyXLCD());
   WriteCmdXLCD(DOFF); // Turn display off. will be turned on later
 
-  while(BusyXLCD());
   SetDDRamAddr(0x02);
   putcXLCD(':');
-
-  while(BusyXLCD());
   SetDDRamAddr(0x05);
   putcXLCD(':');
-
-  while(BusyXLCD());
   SetDDRamAddr(0x43);
   putcXLCD('C');
-
-  while(BusyXLCD());
   SetDDRamAddr(0x4d);
   putcXLCD('L');
 

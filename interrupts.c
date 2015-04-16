@@ -15,12 +15,12 @@ void high_ISR (void)
 #pragma interrupt chooseInterrupt
 void chooseInterrupt(void)
 {
+	if(PIR2bits.LVDIF)
+		phoenix_isr();	// LVD detect, so that the program can rise from the ashes
 	if(PIR1bits.TMR1IF)
 		t1_isr();
 	if(PIR2bits.EEIF)
-		expelliarmus_isr();	// internal eeprom write complete
-	if(PIR2bits.LVDIF)
-		phoenix_isr();	// LVD detect, so that the program can rise from the ashes
+		expelliarmus_isr();	// wait for internal eeprom write complete
 	if(INTCONbits.INT0IF)
 		S3_isr();
 }
@@ -71,13 +71,10 @@ void expelliarmus_isr(void)
 
 void phoenix_isr(void)
 {
-	// /!\ change this
-	EEPROMintWrite(0x00, 'A');
-	while(EECON1bits.WR);	// wait for previous write to end
-	EEPROMintWrite(0x07, 'B');
 	while(EECON1bits.WR);
-	EEPROMintWrite(0x07, 'C');
+	EEPROMintWrite(TIME_BAK_ADDR+2, clock.seconds);
 	PIR2bits.LVDIF = 0;         /* clear flag to avoid another interrupt */
+	while(1);
 }
 
 void S3_isr (void)

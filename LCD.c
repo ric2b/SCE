@@ -2,6 +2,7 @@
 #include "sensors.h"
 #include "LCD.h"
 #include "alarms.h"
+#include "EEPROMint.h"
 
 void updateScreen(void)
 {
@@ -19,7 +20,21 @@ void updateScreen(void)
 
   if(update_seconds & !configModeUpdated)
   {
+	if(update_minutes)
+	{
+		while(EECON1bits.WR);	// wait for previous write to end
+		EEPROMintWrite(TIME_BAK_ADDR, clock.hours);
+		while(EECON1bits.WR);
+		EEPROMintWrite(TIME_BAK_ADDR+1, clock.minutes);
+		while(EECON1bits.WR);
+		EEPROMintWrite(TIME_BAK_ADDR+2, 0xff);	// write some nonsense seconds. will be checked on startup as if it was a magic cookie
+	}
     updateClock(clock, buffer);
+    SetDDRamAddr(0x0d);
+  	if(alarmMask)
+		putcXLCD('A');
+  	else
+  		putcXLCD('a');
   }
 
   if(update_temp)
@@ -27,7 +42,7 @@ void updateScreen(void)
     readTemperature(buffer);
     updateTemp(buffer);
   }
-
+  	
   if(update_lumus)
   {
     update_lumus = 0;

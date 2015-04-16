@@ -22,13 +22,16 @@
 #endif
 
 #define PMON 5
-#define TSOM 2
+#define TSOM 1
 #define NREG 6
+
 
 #define writerEEPROM 0x7FF8
 #define readerEEPROM 0x7FFA
 #define NREGEEPROM 0x7FFC
 #define usedEEPROM 0x7FFE
+
+#define TIME_BAK_ADDR 0x10
 
 /* ----------- STRUCTS ---------------*/
 typedef struct time

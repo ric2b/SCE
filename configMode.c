@@ -131,7 +131,7 @@ void config()
 	char changed = 0;
 	char blink;
 	time temp;
-	char update_code_eeprom = 0b00000000;
+	static unsigned char update_code_eeprom = 0b00000000;
 	//reset the configurable variables
 	//alarm.seconds = alarm.minutes = alarm.hours = 0;
 
@@ -192,11 +192,19 @@ void config()
 			if(changed == 1){
 				clockToChange->seconds = temp.seconds;
 				update_code_eeprom |= 0b00000001;
-				if( update_code_eeprom & 0b0000001)
+				/*if( update_code_eeprom & 0b0000001)
 					addToEEPROM(2);
 				if( update_code_eeprom & 0b0000010)
-					addToEEPROM(3);
+					addToEEPROM(3);*/
 			}
+			
+			if(update_code_eeprom & 0b00000010){
+					addToEEPROM(3);
+					update_code_eeprom &= 0b11111101;
+			}else if(update_code_eeprom & 0b00000001){
+					addToEEPROM(2);
+					update_code_eeprom &= 0b11111110;
+			}	
 
 
 			SetDDRamAddr(0x06);
@@ -300,12 +308,12 @@ void config()
 				updateClockField(0x40, &blink, 100);
 				if(blink != -1){
 					changed = 1;
-					//update_code_eeprom |= 0b00001000;
-					addToEEPROM(5);
 				}
 			}
-			if(changed == 1)
+			if(changed == 1){
 				temperature_treshold = blink;
+				addToEEPROM(5);
+			}		
 			SetDDRamAddr(0x40);
 			readTemperature(buffer);
 			updateTemp(buffer);
@@ -320,12 +328,12 @@ void config()
 				updateClockField(0x4f, &blink, 6);
 				if(blink != -1){
 					changed = 1;
-					//update_code_eeprom |= 0b00000100;
-					addToEEPROM(4);
 				}
 			}
-			if(changed == 1)
+			if(changed == 1){
 				lumus_treshold = blink;
+				addToEEPROM(4);
+			}				
 			SetDDRamAddr(0x4e);
 			putcXLCD(' ');
 			ConvertADC();
@@ -345,19 +353,6 @@ void config()
 			}
 			break;
 	}
-	update_seconds = update_minutes = update_hours = 1;
+	//update_seconds = update_minutes = update_hours = 1;
 	updateLCD = 1;
-	// update_code_eeprom, bit 0 = acerto do relogio, bit 1 = set up alarm, bit 2 = set up lumus, bit 3 = set up temp
-/*	if( ( update_code_eeprom & 0b00000001 ) == 0b00000001 ){
-		addToEEPROM(2);
-	}
-	if( ( update_code_eeprom & 0b00000010 ) == 0b00000010 ){
-		addToEEPROM(3);
-	}
-	if( ( update_code_eeprom & 0b00000100 ) == 0b00000100 ){
-		addToEEPROM(4);
-	}
-	if( ( update_code_eeprom & 0b00001000 ) == 0b00001000 ){
-		addToEEPROM(5);
-	}*/
 }

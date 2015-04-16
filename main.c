@@ -43,9 +43,9 @@ volatile char buzzTimer = 0;
 
 void main (void)
 {
-	#ifdef proteus
-	delayms(100);
-	#endif
+	//#ifdef proteus
+	delayms(1000);
+	//#endif
 	setup();
 	updateScreen();
 
