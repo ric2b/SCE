@@ -59,6 +59,9 @@ void main (void)
 			config();
 		}
 
+		if(update_lumus || update_temp || updateTimeAlarm)
+			EEPROMintUpdateW();
+
 		if(updateTimeAlarm && (alarmMask & 0b00000100))
 			fireTimeAlarm();
 

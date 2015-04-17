@@ -61,6 +61,8 @@ void setup(void)
 		clock.hours = EEPROMintRead(TIME_BAK_ADDR);
 		clock.minutes = EEPROMintRead(TIME_BAK_ADDR+1);
 		clock.seconds = EEPROMintRead(TIME_BAK_ADDR+2);
+    EEPROMintUpdateR();
+    
     while(BusyXLCD());
     SetDDRamAddr(0x4a);
     putcXLCD('V');

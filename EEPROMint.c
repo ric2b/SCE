@@ -58,12 +58,67 @@ void EEPROMintWrite(char addr, char data)
 //	_endasm
 }
 
-void EEPROMintTest(char c)
-{
-	char cenas;
-	EEPROMintWrite(0x00, c);
+void EEPROMintUpdateW(){
+	char hours, minutes, seconds, temp, lumus;
+	// time alarm
+	DisableHighInterrupts();
+	hours = alarm.hours;
+	minutes = alarm.minutes;
+	seconds = alarm.seconds;
+	temp = temperature_treshold;
+	lumus = lumus_treshold;
+	EnableHighInterrupts();
+
 	while(EECON1bits.WR);	// wait for previous write to end
-	cenas = EEPROMintRead(0x00);
-	EEPROMintWrite(0x07, cenas);
+	EEPROMintWrite(VAR_BAK_ADDR, hours);
+	while(EECON1bits.WR);	// wait for previous write to end
+	EEPROMintWrite(VAR_BAK_ADDR+1, minutes);
+	while(EECON1bits.WR);	// wait for previous write to end
+	EEPROMintWrite(VAR_BAK_ADDR+2, seconds);
+
+	// temp alarm
+
+	while(EECON1bits.WR);	// wait for previous write to end
+	EEPROMintWrite(VAR_BAK_ADDR+3, temp);
+
+	// lumus alarm
+
+	while(EECON1bits.WR);	// wait for previous write to end
+	EEPROMintWrite(VAR_BAK_ADDR+4, lumus);
+
+	// magic number
+
+	while(EECON1bits.WR);	// wait for previous write to end
+	EEPROMintWrite(VAR_BAK_ADDR+5, (char)(hours+minutes+seconds+temp+lumus));
+
+
+}
+
+void EEPROMintUpdateR(){
+	char hours, minutes, seconds, temp, lumus, check_sum;
+
+	// time alarm
+
+	hours = EEPROMintRead(VAR_BAK_ADDR);
+	minutes = EEPROMintRead(VAR_BAK_ADDR+1);
+	seconds = EEPROMintRead(VAR_BAK_ADDR+2,);
+
+	// temp alarm
+
+	temp = EEPROMintRead(VAR_BAK_ADDR+3);
+
+	// lumus alarm
+
+	lumus = EEPROMintRead(VAR_BAK_ADDR+4);
+
+	check_sum = EEPROMintRead(VAR_BAK_ADDR+5);
+
+	if( (char)(hours + minutes + seconds + temp + lumus) == check_sum){
+		alarm.hours= hours;
+		alarm.minutes = minutes;
+		alarm.seconds = seconds;
+		temperature_treshold = temp;
+		lumus_treshold = lumus;
+	}
 }
 

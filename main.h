@@ -32,6 +32,7 @@
 #define usedEEPROM 0x7FFE
 
 #define TIME_BAK_ADDR 0x10
+#define VAR_BAK_ADDR 0x20
 
 /* ----------- STRUCTS ---------------*/
 typedef struct time
