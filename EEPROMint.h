@@ -5,7 +5,7 @@ void EEPROMintDisInt(void);
 void EEPROMintErrClear(void);
 char EEPROMintRead(char addr);
 void EEPROMintWrite(char addr, char data);
-void EEPROMintUpdateW();
-void EEPROMintUpdateR();
+void EEPROMintUpdateW(void);
+void EEPROMintUpdateR(void);
 
 #endif

@@ -1,4 +1,6 @@
 #include <p18f452.h>  /* for the special function register declarations */
+#include "main.h"
+#include "interrupts.h"
 
 void EEPROMintDisInt(void)
 {
@@ -58,7 +60,7 @@ void EEPROMintWrite(char addr, char data)
 //	_endasm
 }
 
-void EEPROMintUpdateW(){
+void EEPROMintUpdateW(void){
 	char hours, minutes, seconds, temp, lumus;
 	// time alarm
 	DisableHighInterrupts();
@@ -94,14 +96,14 @@ void EEPROMintUpdateW(){
 
 }
 
-void EEPROMintUpdateR(){
+void EEPROMintUpdateR(void){
 	char hours, minutes, seconds, temp, lumus, check_sum;
 
 	// time alarm
 
 	hours = EEPROMintRead(VAR_BAK_ADDR);
 	minutes = EEPROMintRead(VAR_BAK_ADDR+1);
-	seconds = EEPROMintRead(VAR_BAK_ADDR+2,);
+	seconds = EEPROMintRead(VAR_BAK_ADDR+2);
 
 	// temp alarm
 

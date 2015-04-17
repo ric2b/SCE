@@ -126,7 +126,7 @@ file_020=eeprom.h
 file_021=sensors.h
 file_022=alarms.h
 file_023=EEPROMint.h
-file_024=C:\Users\sce\Desktop\18f452i.lkr
+file_024=C:\MCC18\lkr\18f452i.lkr
 [SUITE_INFO]
 suite_guid={5B7D72DD-9861-47BD-9F60-2BE967BF8416}
 suite_state=
