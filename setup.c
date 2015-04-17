@@ -83,6 +83,9 @@ void setup(void)
 		EEPROMintUpdateR();
 	}
 
+	while(EECON1bits.WR);
+	EEPROMintWrite(TIME_BAK_ADDR+2, 0xff);	// write some nonsense seconds. will be checked on startup as if it was a magic cookie
+
 	/* I2C */
 	TRISC = 0b00011000; // I2C pins
 	//SSPADD = 0b00000111;    // Set baud rate

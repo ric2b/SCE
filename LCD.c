@@ -26,8 +26,7 @@ void updateScreen(void)
 		EEPROMintWrite(TIME_BAK_ADDR, clock.hours);
 		while(EECON1bits.WR);
 		EEPROMintWrite(TIME_BAK_ADDR+1, clock.minutes);
-		while(EECON1bits.WR);
-		EEPROMintWrite(TIME_BAK_ADDR+2, 0xff);	// write some nonsense seconds. will be checked on startup as if it was a magic cookie
+    // seconds are written after testing the magic word or in the LVD interrupt
 	}
     updateClock(clock, buffer);
     SetDDRamAddr(0x0d);
