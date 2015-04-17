@@ -56,19 +56,16 @@ void setup(void)
   PIE2bits.LVDIE = 1;         /* enable LVD interrupt */
 
   // check LVD flag
-  if(isLVD())
-  {
 	if((unsigned char) EEPROMintRead(TIME_BAK_ADDR+2) < 60)
 	{
 		clock.hours = EEPROMintRead(TIME_BAK_ADDR);
 		clock.minutes = EEPROMintRead(TIME_BAK_ADDR+1);
 		clock.seconds = EEPROMintRead(TIME_BAK_ADDR+2);
+    while(BusyXLCD());
+    SetDDRamAddr(0x4a);
+    putcXLCD('V');
 	}
 
-	while(BusyXLCD());
-	SetDDRamAddr(0x4a);
-	putcXLCD('V');
-  }
 
 
 
