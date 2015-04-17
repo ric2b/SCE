@@ -40,15 +40,15 @@
 
 \subsection{Buffer Circular}
 
-Os registos armazenados estão alinhados a 8 bytes, de modo a que não haja escritas distribuídas por duas páginas. Assim pode-se sempre escrever 8 bytes de uma vez, sem nunca ter que verificar se é necessário continuar a escrever noutra página. Os últimos 8 endereços estão reservados para guardar a informação necessária a manutenção do buffer circular. Para endereçar a EEPROM externa é necessário enviar 2 bytes de endereço através do protocolo I$^2$C, visto que a EEPROM tem 32K $\times$ 8 bits.
+Os registos armazenados estão alinhados a 8 bytes, de modo a que não haja escritas distribuídas por duas páginas. Assim pode-se sempre escrever 8 bytes de uma vez, sem nunca ter que verificar se é necessário continuar a escrever noutra página. Os últimos 8 endereços estão reservados para guardar a informação necessária à manutenção do buffer circular. Para endereçar a EEPROM externa é necessário enviar 2 bytes de endereço através do protocolo I$^2$C, visto que a EEPROM tem 32K $\times$ 8 bits.
 
 \subsection{Tempo}
 
-Para o controlo do relógio e do alarme, foi definida uma estrutura que contém os segundos, minutos e horas, cada um guardado como um byte. A interrupção do Timer1 actualiza a cada segundo a estrutura que guarda o tempo. Outros eventos que podem ocorrer apenas em tempos múltiplos de um segundo são também sinalizados por estar rotina de interrupção.
+Para o controlo do relógio e do alarme foi definida uma estrutura que contém os segundos, minutos e horas, cada um guardado como um byte. A interrupção do Timer1 actualiza a cada segundo a estrutura que guarda o tempo. Outros eventos que podem ocorrer apenas em tempos múltiplos de um segundo são também sinalizados por esta rotina de interrupção.
 
 \subsection{Configuração}
 
-No modo configuração é possível ligar e desligar os alarmes individualmente e assim alterar os vários valores que são configuráveis (clock, alarm, limiar de temperatura e de luminosidade), por exemplo, é possível ligar apenas o alarme da temperatura e não ligar os alarmes restantes.
+No modo configuração é possível ligar e desligar os alarmes individualmente e assim alterar os vários valores que são configuráveis (clock, alarm, limiar de temperatura e de luminosidade), por exemplo, é possível ligar apenas o alarme da temperatura e não ligar os restantes alarmes.
 
 
 \section{Rotinas}
@@ -57,10 +57,9 @@ No modo configuração é possível ligar e desligar os alarmes individualmente 
 
 Quando em modo normal, se pressiona o botão S3 uma interrupção é chamada que activa/altera o modo de configuração. Dentro do \texttt{config()} entra-se em modo de configuração e o programa mantêm-se nesse modo até que se tenha passado por todos os parâmetros que podem ser configurados -- tempo, alarme, limiar de temperatura e luminosidade. O botão S3 permite portanto seleccionar o parâmetro a alterar, enquanto que o botão S2 permite alterar o valor seleccionado.
 
-De modo a minimizar o consumo energético é registado que parâmetros são alterados de modo a apenas actualizar no ecrã e em memória os valores que realmente foram redefinidos pelo utilizador.
-
 Foi implementado \textit{debounce} para o botão S2, de forma a que cada vez que se carrega neste botão, o valor que está a ser alterado seja incrementado em apenas uma unidade. Não foi implementado \textit{debounce} para o botão S3 visto que este tem um schmidtt trigger à entrada, o que resolve o \textit{bounce} neste botão.
 
+De modo a minimizar o consumo energético é registado que parâmetros são alterados de modo a apenas actualizar no ecrã e em memória os valores que realmente foram redefinidos pelo utilizador.
 
 \subsection{Alarmes}
 
@@ -69,7 +68,7 @@ A verificação do alarme do relógio é feita de segundo em segundo. Antes de s
 
 \subsection{Interrupções -- Timer1, S3, WREN e LVD}
 
-A interrupção do Timer1 é chamada de segundo a segundo e actualiza a hora do relógio. Nesta interrupção também é verificado se já passaram \texttt{PMON} segundos e é preciso voltar a verificar os valores dos vários alarmes.
+A interrupção do Timer1 é chamada de segundo a segundo e actualiza a hora do relógio. Nesta interrupção também é verificado se já passaram \texttt{PMON} segundos desde a última verificação e é preciso voltar a verificar os valores dos vários alarmes.
 
 A rotina de interrupção \texttt{S3\_isr()} é invocada sempre que se utiliza o botão de pressão S3, que altera o campo selecionado no modo configuração.
 
