@@ -1,47 +1,87 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper,12pt]{article}
 
-\usepackage{tecnico_relatorio}
-
-\usepackage{textcomp}
+\usepackage[portuguese]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+%\usepackage{multirow}
 \usepackage[hypcap]{caption} % makes \ref point to top of figures and tables
-\usepackage{rotating}
+\usepackage{amsmath}
+%\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+%\usepackage{rotating}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[margin=0.95	in]{geometry} %margens da página
+
 
 \begin{document}
-	\trSetImage{img/tecnico_logo}{6cm} % Logotipo do Técnico
-	\trSetSubject{Sistemas Computacionais Embebidos}
-	\trSetTitle{Sistema de Monitorização e Alarme}
-	\trSetType{1ª parte}
 
-	\trSetBoxStyle{0.3}
-
-	\trSetAuthorNr{3}
-
-	\trSetAuthors
-		{
-		Francisco
-		
-		Leal
-
-		72939
-		}{
-		Gonçalo
-		
-		Ribeiro
-
-		73294
-		}{
-		Ricardo
-		
-		Amendoeira
-
-		73373
-		}
-
-	\trSetProfessor{Carlos Almeida}
-
-	\trMakeCover
+	\pagenumbering{gobble}
+	\input{./rosto.tex}
 
 	\tableofcontents
 	\pagebreak
+
+
+
+
+Estruturas de Dados
+
+Buffer circular
+
+Para o controlo do buffer circular e escritas e leituras da EEPROM externa, cuja dimensão é 32k x 8 bits - ou seja são necessário 15 bits de endereçamento - usam-se 3 variáveis do tipo short int. Essas variáveis são: i) writerPointer, ii) readerPointer, iii) numberEvents.  Existem também 4 defines que determinam os endereços em que são salvaguardados os três valores referidos anteriormente, sendo que o quarto define indica o número máximo de registos (NREG). O facto de guardar-se estes registos numa EEPROM permite que eles continuem disponíveis mesmo após se ter deixado de alimentar a placa. Os registos armazenados estão alinhados a 8 bytes, de modo a que não haja escritas distribuídas por duas páginas. Assim pode-se sempre escrever 8 bytes de uma vez, sem nunca ter que verificar se é necessário continuar a escrever noutra página.
+
+Time
+
+Para o controlo do relógio e do alarme, foi definida uma estrutura que contém os segundos, minutos e horas, cada um guardado como um byte. A interrupção do Timer1 actualiza a cada segundo a estrutura que guarda o tempo. Outros eventos que podem ocorrer apenas em tempos múltiplos de um segundo são também sinalizados por estar rotina de interrupção.
+
+Config
+
+
+
+Blocos principais de funcionamento (fluxograma)
+
+Partes mais importantes dos algoritmos
+
+Configuração dos alarmes e hora - config()
+
+
+Quando em modo normal, se pressiona o botão S3 uma interrupção é chamada que activa/altera o modo de configuração. Dentro do config() entra-se em modo de configuração e o programa mantêm-se nesse modo até que se tenha passado por todos os parâmetros que podem ser configurados - tempo, alarme, limiar de temperatura e luminosidade. O botão S3 permite portanto seleccionar o parâmetro a alterar, enquanto que o botão S2 permite alterar o valor seleccionado.
+
+De modo a minimizar o consumo energético é registado que parâmetros são alterados de modo a apenas actualizar no ecrã e em memória os valores que realmente foram redefinidos pelo utilizador.
+
+Foi implementado debounce para o botão S2 (visto não ter schmitt trigger), de forma a que cada vez que se carrega neste botão, o valor que está a ser alterado seja incrementado em apenas uma unidade. Sem debounce implementado o valor podia ser incrementado mais do que uma vez inesperadamente. Não foi implementado debounce para o botão S3 visto que este tem um Schmidt trigger à entrada, o que resolve o bounce neste botão.
+
+
+Comunicação I2C com a EEPROM e Sensor de temperatura
+
+Foi implementado o protocolo I2C para comunicar com a EEPROM e o sensor de temperatura através do mesmo barramento. Para iniciar a comunicação é enviado um sinal start seguido de um byte de controlo que identifica o destino e direcção da comunicação, seguido dos dados e no fim um sinal stop. 
+No caso da EEPROM os dados a escrever/ler devem ser precedidos pelo envio de 2 bytes de endereço.
+
+Trigger dos alarmes - fire*Alarm()
+
+Os alarmes de luminosidade e temperatura têm período de amostragem PMON. Se os limiares de temperatura ou de luminosidade forem cruzados (em qualquer sentido), o respectivo alarme dispara. Para fazer a verificação é mantido em memória o valor da amostra anterior.
+A verificação do alarme do relógio é feita de segundo em segundo, comparando os valores da estrutura clock com os da estrutura alarm para testar igualdade. Antes de estas estructuras serem comparadas as interrupções são desligadas para garantir a consistência da comparação - se ocorresse uma interrupção do Timer1 durante a comparação das duas estruturas podia perder-se um alarme.
+
+Rotinas de interrupções - Timer1, S3, WREN e LVD
+
+
+A interrupção do Timer1 é chamada de segundo a segundo e actualiza a hora do relógio. Nesta interrupção também é verificado se já passaram PMON segundos e é preciso voltar a verificar os valores dos vários alarmes.
+A rotina de interrupção S3_isr() é invocada sempre que se utiliza o botão de pressão S3, que altera o campo selecionado.
+
+A rotina LVD_isr() é invocada quando é detectado uma queda na tensão de alimentação, ocasião em que se tenta escrever na EEPROM interna o valor do relógio. Através de variados testes não foi possível registar na EEPROM interna através desta rotina mais do que um byte pelo que foi tomada a decisão de registar os minutos, as horas e os valores de limiar para os alarmes de temperatura e luminosidade sempre que estes são alterados. Desta forma, apenas temos que registar o valor dos segundos quando a rotina LVD_isr() é chamada.
+
+De modo a saber se o que foi registado na EEPROM interna é válido ou não, um valor predefinido de 0xFF é registado no inicio de execução no local destinado aos segundos do relógio, se ao iniciar o programa o valor que estiver nesta posição de memória não for um valor válido para o campo dos segundos então é porque a rotina não teve tempo de escrever na EEPROM interna. Neste caso o relógio é iniciado a 00:00:00 e os limiares dos alarmes de temperatura e luminosidade também são iniciados a 0.
+
+A rotina EEwriteDisable_isr() é invocada quando a escrita que está a decorrer para a EEPROM interna acaba e é usada para  informar o programa  de que já pode escrever o próximo byte.
+
+
+
+
+
+
 
 \end{document}
