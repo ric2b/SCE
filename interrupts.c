@@ -97,3 +97,8 @@ void EnableHighInterrupts (void)
 	RCONbits.IPEN = 1;	/* The IPEN bit in the RCON register enables priority levels for interrupts. If clear, all priorities are set to high. */
 	INTCONbits.GIEH = 1;  /* Enables all un-masked high interrupts */
 }
+
+void DisableHighInterrupts (void)
+{
+	INTCONbits.GIEH = 0;  /* Disables all un-masked high interrupts */
+}
