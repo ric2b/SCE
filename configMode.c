@@ -242,8 +242,8 @@ void config()
 			}
 			SetDDRamAddr(0x09);
 			putcXLCD('A');
-			//changeValueWithS2(&temperature_treshold);
-			//temperature_treshold %= 100;
+			//changeValueWithS2(&temperature_threshold);
+			//temperature_threshold %= 100;
 			break;
 
 		case 5: // activate temperature
@@ -264,8 +264,8 @@ void config()
 			}
 			SetDDRamAddr(0x0A);
 			putcXLCD('T');
-			//changeValueWithS2(&lumos_treshold);
-			//lumos_treshold %= 6;
+			//changeValueWithS2(&lumos_threshold);
+			//lumos_threshold %= 6;
 			break;
 
 		case 6: // activate lumos
@@ -329,7 +329,7 @@ void config()
 				}
 			}
 			if(changed == 1){
-				temperature_treshold = blink;
+				temperature_threshold = blink;
 				addToEEPROM(5);
 			}		
 			SetDDRamAddr(0x40);
@@ -349,7 +349,7 @@ void config()
 				}
 			}
 			if(changed == 1){
-				lumus_treshold = blink;
+				lumus_threshold = blink;
 				addToEEPROM(4);
 			}				
 			SetDDRamAddr(0x4e);

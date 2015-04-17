@@ -41,7 +41,7 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=temperature_treshold;
+			data[4]=temperature_threshold;
 			data[5]=0;
 			data[6]=0;
 			data[7]=0;
@@ -51,7 +51,7 @@ void addToEEPROM(int code){
 			data[1]=clock.minutes;
 			data[2]=clock.seconds;
 			data[3]=code;
-			data[4]=lumus_treshold;
+			data[4]=lumus_threshold;
 			data[5]=0;
 			data[6]=0;
 			data[7]=0;

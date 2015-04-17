@@ -65,8 +65,8 @@ void EEPROMintUpdateW(){
 	hours = alarm.hours;
 	minutes = alarm.minutes;
 	seconds = alarm.seconds;
-	temp = temperature_treshold;
-	lumus = lumus_treshold;
+	temp = temperature_threshold;
+	lumus = lumus_threshold;
 	EnableHighInterrupts();
 
 	while(EECON1bits.WR);	// wait for previous write to end
@@ -117,8 +117,8 @@ void EEPROMintUpdateR(){
 		alarm.hours= hours;
 		alarm.minutes = minutes;
 		alarm.seconds = seconds;
-		temperature_treshold = temp;
-		lumus_treshold = lumus;
+		temperature_threshold = temp;
+		lumus_threshold = lumus;
 	}
 }
 

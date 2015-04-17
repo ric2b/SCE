@@ -5,7 +5,7 @@ void chooseInterrupt(void);
 void EnableHighInterrupts (void);
 void t1_isr (void);
 void S3_isr (void);
-void phoenix_isr(void);
-void expelliarmus_isr(void);
+void LVD_isr(void);
+void EEwriteDisable_isr(void);
 
 #endif

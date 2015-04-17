@@ -54,12 +54,12 @@ void updateScreen(void)
     lumus = adc_result/204;
     putcXLCD(lumus+'0');  // will be on [0,5]
 
-	if( ( (lumus_last < lumus_treshold && lumus > lumus_treshold) ||
-				( lumus_last > lumus_treshold && lumus < lumus_treshold) ) && (alarmMask & 0b00000001) )
+	if( ( (lumus_last < lumus_threshold && lumus > lumus_threshold) ||
+				( lumus_last > lumus_threshold && lumus < lumus_threshold) ) && (alarmMask & 0b00000001) )
 	{
 		fireLumusAlarm();
 	}
-	if( lumus != lumus_treshold )
+	if( lumus != lumus_threshold )
 	{
 		lumus_last = lumus;
 	}
@@ -73,12 +73,12 @@ void updateTemp(char * temperature)
 	SetDDRamAddr(0x40);
 	putsXLCD(temperature);
 
-	if( ( (temp_last < temperature_treshold && temp > temperature_treshold) ||
-				( temp_last > temperature_treshold && temp < temperature_treshold) ) && (alarmMask & 0b00000010) )
+	if( ( (temp_last < temperature_threshold && temp > temperature_threshold) ||
+				( temp_last > temperature_threshold && temp < temperature_threshold) ) && (alarmMask & 0b00000010) )
 	{
 		fireTempAlarm();
 	}
-	if( temp != temperature_treshold )
+	if( temp != temperature_threshold )
 	{
 		temp_last = temp;
 	}

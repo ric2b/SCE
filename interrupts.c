@@ -16,11 +16,11 @@ void high_ISR (void)
 void chooseInterrupt(void)
 {
 	if(PIR2bits.LVDIF)
-		phoenix_isr();	// LVD detect, so that the program can rise from the ashes
+		LVD_isr();	// LVD detect, so that the program can rise from the ashes
 	if(PIR1bits.TMR1IF)
 		t1_isr();
 	if(PIR2bits.EEIF)
-		expelliarmus_isr();	// wait for internal eeprom write complete
+		EEwriteDisable_isr();	// wait for internal eeprom write complete
 	if(INTCONbits.INT0IF)
 		S3_isr();
 }
@@ -63,22 +63,18 @@ void t1_isr (void)
 	PIR1bits.TMR1IF = 0;         /* clear flag to avoid another interrupt */
 }
 
-void expelliarmus_isr(void)
+void EEwriteDisable_isr(void)
 {
 	EECON1bits.WREN = 0;	// Disable writes on write complete (EEIF set)
 	PIR2bits.EEIF = 0;		/* clear flag to avoid another interrupt */
 }
 
-void phoenix_isr(void)
+void LVD_isr(void)
 {
 	while(EECON1bits.WR);
 	EEPROMintWrite(TIME_BAK_ADDR+2, clock.seconds);
 	PIR2bits.LVDIF = 0;         /* clear flag to avoid another interrupt */
-//	while(1) // stop the program from running
-//	{
-//		SetDDRamAddr(0x4b);
-//		putcXLCD('P');
-//	}	
+	while(1);
 }
 
 void S3_isr (void)

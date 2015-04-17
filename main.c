@@ -15,8 +15,8 @@
 volatile time clock;
 time alarm;
 time * clockToChange = &clock;
-char temperature_treshold = 10;
-char lumus_treshold = 5;
+char temperature_threshold = 10;
+char lumus_threshold = 5;
 char updateLCD = 1;
 char lumus = 0;
 char lumus_last = 0;
