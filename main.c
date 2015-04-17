@@ -23,7 +23,6 @@ char lumus_last = 0;
 char temp_last = 0;
 char temp = 0; // temperature, NOT temporary!
 char alarmMask = 0; //3 lsb's define if the clock, temperature or lumos alarms are enabled (respectively)
-char sleeping = 0;
 
 short int writerPointer=0;
 short int readerPointer=0;
@@ -40,17 +39,19 @@ volatile char update_lumus = 1;
 volatile char pmon_counter = 0;
 volatile char updateTimeAlarm = 0;
 volatile char buzzTimer = 0;
+volatile char sleeping = 0;
 
 void main (void)
 {
 	//#ifdef proteus
-	delayms(1000);
+	//delayms(50);
 	//#endif
+	//RCON &= 0b11100000;
 	setup();
 	updateScreen();
 
-	if(PMON != 0)
-		addToEEPROM(1); // Execution begins! 1 stands for that
+//	if(PMON != 0)
+//		addToEEPROM(1); // Execution begins! 1 stands for that
 
 	while(1)
 	{
@@ -71,7 +72,7 @@ void main (void)
 		if(buzzTimer == 0)
 		{
 			buzzKill();
-			Sleep();	// cannot sleep while buzzer should be on
+			Sleep();	 // cannot sleep while buzzer should be on
 		}
 	}
 }

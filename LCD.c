@@ -35,6 +35,7 @@ void updateScreen(void)
 		putcXLCD('A');
   	else
   		putcXLCD('a');
+  	SetDDRamAddr(0x50);
   }
 
   if(update_temp)

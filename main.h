@@ -10,10 +10,10 @@
 #include <i2c.h>
 
 /* ----------- DEFINES ---------------*/
-#define debug
+//#define debug
 #define WDT_DISABLED
 //#define proteus
-
+#define BusyXLCD() 0
 
 #ifndef debug
 #define F_CPU 4000	// in kHz
@@ -51,7 +51,6 @@ extern char updateLCD;
 extern char lumus;
 extern char temp;
 extern char alarmMask;
-extern char sleeping;
 extern char temp_last;
 extern char lumus_last;
 // these variables are changed by ISRs
@@ -67,6 +66,8 @@ extern volatile char update_lumus;
 extern volatile char pmon_counter;
 extern volatile char updateTimeAlarm;
 extern volatile char buzzTimer;
+extern volatile char sleeping;
+
 
 /*----- EEPROM VARIABLES ---------------*/
 extern short int writerPointer;
