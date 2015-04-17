@@ -74,7 +74,11 @@ void phoenix_isr(void)
 	while(EECON1bits.WR);
 	EEPROMintWrite(TIME_BAK_ADDR+2, clock.seconds);
 	PIR2bits.LVDIF = 0;         /* clear flag to avoid another interrupt */
-	while(1);
+//	while(1) // stop the program from running
+//	{
+//		SetDDRamAddr(0x4b);
+//		putcXLCD('P');
+//	}	
 }
 
 void S3_isr (void)

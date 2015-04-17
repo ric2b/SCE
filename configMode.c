@@ -63,6 +63,7 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 			putcXLCD(time_buf[1]);
 		else
 			putsXLCD(time_buf);
+		SetDDRamAddr(0x50);
 	}
 	else if(blink == 0)
 	{
@@ -75,6 +76,7 @@ void updateClockField(char LCDaddr, char * fielddata, char modulos)
 			putcXLCD(time_buf[1]);
 		else
 			putsXLCD(time_buf);
+		SetDDRamAddr(0x50);
 	}
 }
 
@@ -84,11 +86,20 @@ char alarmONOFF(char alarmID, char character, char LCDaddr)
 	char blink;
 	// this section blinks the alarm character
 	blink = cursorState(0);
-	SetDDRamAddr(LCDaddr);
+	
 	if(blink == 0)
+	{
+		SetDDRamAddr(LCDaddr);
 		putcXLCD(' ');
+		SetDDRamAddr(0x50);
+	}
 	if(blink > 0)
+	{
+		SetDDRamAddr(LCDaddr);
 		putcXLCD(character);
+		SetDDRamAddr(0x50);
+	}
+	SetDDRamAddr(0x50);
 	// this section changes the active status of the alarm
 	if(changeValueWithS2(buffer)) //ignore the buffer
 	{
@@ -280,13 +291,20 @@ void config()
 		case 7: // energy savings
 			while(configMode == 7)
 			{
-				SetDDRamAddr(0x0f);
 				blink = cursorState(0);
 				if(blink == 0)
+				{
+					SetDDRamAddr(0x0f);
 					putcXLCD(' ');
+					SetDDRamAddr(0x50);
+				}
 				if(blink > 0)
+				{
+					SetDDRamAddr(0x0f);
 					putcXLCD('P');
-
+					SetDDRamAddr(0x50);
+				}
+				
 				if(changeValueWithS2(&blink)) //ignore blink
 				{
 					configMode = 0;
