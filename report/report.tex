@@ -63,8 +63,8 @@ Foi implementado \textit{debounce} para o botão S2, de forma a que cada vez que
 
 De modo a minimizar o consumo energético é registado que parâmetros são alterados de modo a apenas actualizar no ecrã e em memória os valores que realmente foram redefinidos pelo utilizador.
 
-\subsubsection{Algoritmo de Debouncing}
-O algoritmo usado para debouncing consiste em encontrar o momento em que o utilizador larga o botão (o flanco descendente). Para isto é usado um registo das últimas 16 leituras do botão S2 (guardado numa variável de 16 bits), shiftando para a esquerda cada vez que se faz nova leitura e adicionando o valor lido. O flanco descendente é encontrado quando apenas há um registo de botão pressionado e é o registo mais antigo, ou seja, 0x8000.
+\subsubsection{Algoritmo de \textit{Debouncing}}
+O algoritmo usado para \textit{debouncing} consiste em encontrar o momento em que o utilizador larga o botão (o flanco descendente). Para isto é usado um registo das últimas 16 leituras do botão S2 (guardado numa variável de 16 bits), shiftando para a esquerda cada vez que se faz nova leitura e adicionando o valor lido. O flanco descendente é encontrado quando apenas há um registo de botão pressionado e é o registo mais antigo, ou seja, \texttt{0x8000}.
 \begin{lstlisting}
 boolean incrementarComS2(* valor)
 {
