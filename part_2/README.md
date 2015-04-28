@@ -2,10 +2,10 @@
 
 ##Funcionalidades a implementar
 
-..*Comunicação série RS232 para permitir o acesso remoto.
-..*Realização das operações de reconfiguração e transferência da informação recolhida.
-..*Notificação assíncrona de memória cheia (registos não transferidos > NREG / 2) através da linha série RS232.
-..*Acrescentar os eventos EMPM e ENMCH relativos à modificação do período de monitorização e à notificação de memória cheia.
+*Comunicação série RS232 para permitir o acesso remoto.
+*Realização das operações de reconfiguração e transferência da informação recolhida.
+*Notificação assíncrona de memória cheia (registos não transferidos > NREG / 2) através da linha série RS232.
+*Acrescentar os eventos EMPM e ENMCH relativos à modificação do período de monitorização e à notificação de memória cheia.
 
 ###Eventos a adicionar
 
@@ -17,9 +17,9 @@
 ###Interface com o utilizador
 
 Exitem três blocos de comandos:
-..*comandos que interagem com a tarefa de comunicação
-..*big description no pdf
-..*comandos que interagem com a tarefa de processamento
+	*comandos que interagem com a tarefa de comunicação
+	*big description no pdf
+	*comandos que interagem com a tarefa de processamento
 
 ###Possivel ordem de implementação
 
