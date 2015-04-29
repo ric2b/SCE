@@ -243,7 +243,7 @@ void cmd_mpt (int argc, char **argv)
 		return;
 	}
 
-	sscanf(argv[1], "%d", new_monit_time);
+	sscanf(argv[1], "%d", &new_monit_time);
 
 	setPerTransferencia((char) new_monit_time);
 	return;
@@ -254,7 +254,7 @@ void cmd_mpt (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_lar (int argc, char **argv)
 {
-	int h1,m1,s1,h2,m2,s2;
+	int h1=0,m1=0,s1=0,h2=0,m2=0,s2=0;
 
 	if(argc < 7){
 		if( argc < 4){
@@ -265,20 +265,20 @@ void cmd_lar (int argc, char **argv)
 			m2 = 61;
 			s2 = 61;
 		}else{
-			sscanf(argv[1], "%d", h1);
-			sscanf(argv[2], "%d", m1);
-			sscanf(argv[3], "%d", s1);
+			sscanf(argv[1], "%d",&h1);
+			sscanf(argv[2], "%d",&m1);
+			sscanf(argv[3], "%d",&s1);
 			h2 = 25;
 			m2 = 61;
 			s2 = 61;
 		}
 	}else{
-		sscanf(argv[1], "%d", h1);
-		sscanf(argv[2], "%d", m1);
-		sscanf(argv[3], "%d", s1);
-		sscanf(argv[4], "%d", h2);
-		sscanf(argv[5], "%d", m2);
-		sscanf(argv[6], "%d", s2);
+		sscanf(argv[1], "%d", &h1);
+		sscanf(argv[2], "%d", &m1);
+		sscanf(argv[3], "%d", &s1);
+		sscanf(argv[4], "%d", &h2);
+		sscanf(argv[5], "%d", &m2);
+		sscanf(argv[6], "%d", &s2);
 	}
 
 	getClockAlarms(h1,m1,s1,h2,m2,s2);
@@ -289,7 +289,7 @@ void cmd_lar (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_lat (int argc, char **argv)
 {
-	int h1,m1,s1,h2,m2,s2;
+	int h1=0,m1=0,s1=0,h2=0,m2=0,s2=0;
 
 	if(argc < 7){
 		if( argc < 4){
@@ -300,20 +300,20 @@ void cmd_lat (int argc, char **argv)
 			m2 = 61;
 			s2 = 61;
 		}else{
-			sscanf(argv[1], "%d", h1);
-			sscanf(argv[2], "%d", m1);
-			sscanf(argv[3], "%d", s1);
+			sscanf(argv[1], "%d", &h1);
+			sscanf(argv[2], "%d", &m1);
+			sscanf(argv[3], "%d", &s1);
 			h2 = 25;
 			m2 = 61;
 			s2 = 61;
 		}
 	}else{
-		sscanf(argv[1], "%d", h1);
-		sscanf(argv[2], "%d", m1);
-		sscanf(argv[3], "%d", s1);
-		sscanf(argv[4], "%d", h2);
-		sscanf(argv[5], "%d", m2);
-		sscanf(argv[6], "%d", s2);
+		sscanf(argv[1], "%d", &h1);
+		sscanf(argv[2], "%d", &m1);
+		sscanf(argv[3], "%d", &s1);
+		sscanf(argv[4], "%d", &h2);
+		sscanf(argv[5], "%d", &m2);
+		sscanf(argv[6], "%d", &s2);
 	}
 
 	getTempeAlarms(h1,m1,s1,h2,m2,s2);
@@ -324,7 +324,7 @@ void cmd_lat (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_lal (int argc, char **argv)
 {
-	int h1,m1,s1,h2,m2,s2;
+	int h1=0,m1=0,s1=0,h2=0,m2=0,s2=0;
 
 	if(argc < 7){		// no caso de não terem sido passados argumentos suficientes
 		if( argc < 4){	// queremos todos até ao fim, dai substituir pelos valores de limite de t1 e t2
@@ -335,20 +335,20 @@ void cmd_lal (int argc, char **argv)
 			m2 = 61;
 			s2 = 61;
 		}else{
-			sscanf(argv[1], "%d", h1);
-			sscanf(argv[2], "%d", m1);
-			sscanf(argv[3], "%d", s1);
+			sscanf(argv[1], "%d", &h1);
+			sscanf(argv[2], "%d", &m1);
+			sscanf(argv[3], "%d", &s1);
 			h2 = 25;
 			m2 = 61;
 			s2 = 61;
 		}
 	}else{
-		sscanf(argv[1], "%d", h1);
-		sscanf(argv[2], "%d", m1);
-		sscanf(argv[3], "%d", s1);
-		sscanf(argv[4], "%d", h2);
-		sscanf(argv[5], "%d", m2);
-		sscanf(argv[6], "%d", s2);
+		sscanf(argv[1], "%d", &h1);
+		sscanf(argv[2], "%d", &m1);
+		sscanf(argv[3], "%d", &s1);
+		sscanf(argv[4], "%d", &h2);
+		sscanf(argv[5], "%d", &m2);
+		sscanf(argv[6], "%d", &s2);
 	}
 
 	getLumusAlarms(h1,m1,s1,h2,m2,s2);
@@ -415,7 +415,7 @@ void cmd_ems (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_emh (int argc, char **argv)
 {
-  unsigned int n, i;
+  unsigned int n=0, i;
   unsigned char bufw[50];
 
   if ((n=argc) > 1) {
@@ -439,7 +439,7 @@ void cmd_emh (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_rms (int argc, char **argv)
 {
-  unsigned int n;
+  unsigned int n=0;
   char bufr[50];
 
   if (argc > 1) n = atoi(argv[1]);
@@ -453,7 +453,7 @@ void cmd_rms (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_rmh (int argc, char **argv)
 {
-  unsigned int n, i;
+  unsigned int n=0, i;
   unsigned char bufr[50];
 
   if (argc > 1) n = atoi(argv[1]);

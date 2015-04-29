@@ -41,7 +41,7 @@ void getRegistersPer(void){
 
 /* send a message to the board. limited to 98 bytes */
 void sendMSGToBoard(char *msg, char size){
-	int i; 
+	unsigned int i; 
 	if( size > 98){
 		printf("String too big to safely send to board\n");
 	}else{
@@ -59,7 +59,7 @@ void sendMSGToBoard(char *msg, char size){
 		i=size+2; // # of unsent bytes
 		//while(i != 0)
 		{ /* keep trying to send until all bytes are sent */
-			err = cyg_io_write(serH, buffer[size+1 - i], &i);
+			err = cyg_io_write(serH, buffer, &i);
 		}
 	}
 	//return i;
@@ -68,16 +68,21 @@ void sendMSGToBoard(char *msg, char size){
 /* get a message from the board, limited to 98 bytes + SOM and EOM */
 char *getMSGfromBoard(void){
 	char bufr[100];
-	int n = 100;
+	unsigned int n = 100;
+	char *ret;
 	err = cyg_io_read(serH, bufr, &n);
 	
-	return bufr;
+	ret = malloc(sizeof(char)*n);
+	strcpy(ret, bufr);
+
+	return ret;
+	
 }
 
 /* get the size of a message, the buffer should include SOM and EOM */
 char getSizeOfMSG(char * msg){
 	int i;
-	int size;
+	//int size;
 	
 	if(msg[0] != SOM)
 		return 0;
@@ -122,7 +127,7 @@ void processing(cyg_addrword_t data){
 		{
 			p = strtok(p, " \t\n");
 			argv[argc] = p;
-			if (p == NULL) return argc;
+			if (p == NULL) break;
 		}
 		argv[argc] = p;
 

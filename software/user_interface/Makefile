@@ -29,17 +29,17 @@ all: cmd
 clean:
 	-rm -f cmd $(OBJS)
 
-%.o: %.c
-	$(XCC) -c -o $*.o $(DEFS) $(CFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+%.o: %.c $(DEFS)
+	$(XCC) -c -o $*.o $(CFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
-%.o: %.cxx
-	$(XCXX) -c -o $*.o $(DEFS) $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+%.o: %.cxx $(DEFS)
+	$(XCXX) -c -o $*.o $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
-%.o: %.C
-	$(XCXX) -c -o $*.o $(DEFS) $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+%.o: %.C $(DEFS)
+	$(XCXX) -c -o $*.o $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
-%.o: %.cc
-	$(XCXX) -c -o $*.o $(DEFS) $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+%.o: %.cc $(DEFS)
+	$(XCXX) -c -o $*.o $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
 cmd: $(OBJS)
 	$(XLD) $(LDFLAGS) $(ECOS_GLOBAL_LDFLAGS) -o $@ $(OBJS)

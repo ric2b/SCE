@@ -16,9 +16,9 @@ typedef struct _circularbuf_{
 	char data[NRBUF][8];
 }circularbuf;
 
-unsigned char wPointer=0;
-unsigned char rPointer=0;
-unsigned char regWritten=0;
+unsigned char wPointer;
+unsigned char rPointer;
+unsigned char regWritten;
 
 circularbuf shared_mem;
 
