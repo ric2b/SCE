@@ -65,29 +65,29 @@ struct 	command_d {
 	{cmd_rms,  "rms","<n>              receber mensagem (string)"},
 	{cmd_rmh,  "rmh","<n>              receber mensagem (hexadecimal)"},
 	{cmd_test, "teste","<arg1> <arg2>  comando de teste"},
-	{cmd_cr,	"cr"},		// consultar relogio
-	{cmd_ar,	"ar"},		// acertar relogio 													- precisa de argumentos
-	{cmd_ctl,	"ctl"},		// consultar temperatura e luminosidade
-	{cmd_cp,	"cp"},		// consultar parametros (NREG, PMON, TSOM)
-	{cmd_mpm,	"mpm"},		// modificar perıodo de monitorizacao (segundos - 0 desactiva) 		- precisa de argumentos
-	{cmd_ca,	"ca"},		// consultar alarmes (relogio, temp., lumi., activos/inactivos)
-	{cmd_dar,	"dar"},		// definir alarme relogio											- precisa de argumentos
-	{cmd_dat,	"dat"},		// definir alarme temperatura										- precisa de argumentos
-	{cmd_dal,	"dal"},		// definir alarme luminosidade										- precisa de argumentos
-	{cmd_aa,	"aa"},		// activar/desactivar alarmes
-	{cmd_ir,	"ir"},		// informacao sobre registos (NREG, nr, iescrita, ileitura)
-	{cmd_trc,	"trc"},		// transferir n registos (ind. leit. corrente)						- precisa de argumentos
-	{cmd_tri,	"tri"},		// transferir n registos a partir do ındice i						- precisa de argumentos
-	{cmd_irl,	"irl"},		// informacao registos locais (NRBUF, nr, iescrita, ileitura)
-	{cmd_lr,	"lr"},		// listar n registos (mem. local) a partir do ındice i				- precisa de argumentos	
-	{cmd_er,	"er"},		// eliminar registos locais
-	{cmd_cpt,	"cpt"},		// consultar perıodo de transferencia
-	{cmd_mpt,	"mpt"},		// modificar perıodo de transferencia (minutos - 0 desactiva)		- precisa de argumentos
-	{cmd_lar,	"lar"},		// listar alarmes relogio entre t1 e t2								- precisa de argumentos
-	{cmd_lat,	"lat"},		// listar alarmes temperatura entre t1 e t2							- precisa de argumentos
-	{cmd_lal,	"lal"},		// listar alarmes luminosidade entre t1 e t2						- precisa de argumentos
-	{cmd_iga,	"iga"},		// informacao gestao alarmes (definicao e activacao)
-	{cmd_ig, 	"ig"}		// informacao geral (inıcio, relogio, memoria, perıodo monit.)
+	{cmd_cr,	"cr","                  consultar relogio"},
+	{cmd_ar,	"ar","<h> <m> <s>       acertar relogio"},
+	{cmd_ctl,	"ctl","                 consultar temp e lum"},
+	{cmd_cp,	"cp","                  consultar parametros"},
+	{cmd_mpm,	"mpm","<p>              modificar pmon"},
+	{cmd_ca,	"ca","                  consultar alarmes"},
+	{cmd_dar,	"dar","<h> <m> <s>      definir alarme clock"},
+	{cmd_dat,	"dat","<t>              definir alarme temp"},
+	{cmd_dal,	"dal","<l>              definir alarm lumus"},
+	{cmd_aa,	"aa","                  activar/desativar alarmes"},
+	{cmd_ir,	"ir","                  informacao sobre registos"},
+	{cmd_trc,	"trc","<n>              transferir n registos"},
+	{cmd_tri,	"tri","<n> <i>          transferir n registos a partir de i"},
+	{cmd_irl,	"irl","                 informacao registos locais"},
+	{cmd_lr,	"lr","<n> <i>           listar n registos locais a partir de i"},
+	{cmd_er,	"er","                  eliminar registos locais"},
+	{cmd_cpt,	"cpt","                 consultar periodo de transferencia"},
+	{cmd_mpt,	"mpt","<p>              modificar periodo de transferencia"},
+	{cmd_lar,	"lar","<h> <m> <s>,<h> <m> <s> listar alarmes clk entre t1 e t2"},
+	{cmd_lat,	"lat","<h> <m> <s>,<h> <m> <s> listar alarmes temp entre t1 e t2"},
+	{cmd_lal,	"lal","<h> <m> <s>,<h> <m> <s> listar alarmes lumus entre t1 e t2"},
+	{cmd_iga,	"iga","                 informacao gestao alarmes"},
+	{cmd_ig, 	"ig","                  informacao geral"}
 };
 
 #define NCOMMANDS  (sizeof(commands)/sizeof(struct command_d))
