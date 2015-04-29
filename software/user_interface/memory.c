@@ -136,3 +136,7 @@ void getLumusAlarms(void){
 	}
 }
 
+void getLocalReg(void){
+	printf("NRBUF - %d | nr - %d | iescrita %d | ileitura %d", NRBUF, regWritten, wPointer, rPointer);
+}
+
