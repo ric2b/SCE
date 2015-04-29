@@ -19,14 +19,15 @@ void high_ISR (void)
 #pragma interrupt chooseInterrupt
 void chooseInterrupt(void)
 {
-	if(PIR1bits.TXIF)
+	if(PIR1bits.RCIF)
 		USARTread_isr();	// USART read something
 }
 #pragma code
 
 void USARTread_isr(void)
 {
-	// TXIF flag bit will be set, regardless of the state of the TXIE enable bit and cannot be cleared in software.
+	// The RCIF flag bit is a read only bit that is cleared by the hardware. It is cleared when the RCREG register has been read and is empty.
+	PIE1bits.RCIE = 0;	// disables USART read interrupt
 
 	// dummy code to see USART read interrupt
 	TRISBbits.TRISB1 = 0;
@@ -45,27 +46,29 @@ void main()
 	char data[40];	// change to 8 or something
 	// Asynchronous mode is stopped during SLEEP.
 	OpenUSART(USART_TX_INT_OFF &
-			USART_RX_INT_ON   &
+			USART_RX_INT_ON    &
 			USART_ASYNCH_MODE  &	// NRZ format (1 start bit, 8 or 9 data bits and 1 stop bit)
 			USART_EIGHT_BIT    &	// 8 bits of data
 			USART_CONT_RX      &
-			USART_BRGH_HIGH, 25);
+			USART_BRGH_HIGH, 25);	// 9600 baud for operating freq 4 MHz
 
 	EnableHighInterrupts();
 
-	// PIE1bits.TXIE = 0	// disables USART read interrupt
+	// PIE1bits.RCIE = 0;	// disables USART read interrupt
 
 	while(1)
 	{
 
-		i = 0;
+		i = -1;
 		do
 		{
+			i++;
 			while(!PIR1bits.RCIF);	// wait until data is available to be read
 			data[i] = RCREG;
-			i++;
 		}while(data[i] != EOM);
 
+		TRISBbits.TRISB2 = 0;
+		PORTBbits.RB2 = 1;
 
 		i = 0;
 		do
