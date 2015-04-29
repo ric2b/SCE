@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cyg/kernel/kapi.h>
+#include <cyg/io/io.h>
 
 #define NR_THREADS 3
 #define PRIORITY_INTERFACE 10
@@ -13,56 +14,34 @@
 
 #define NAME_PROCESSING "thread processing"
 #define NAME_INTERFACE "thread interface"
-#define NAME_COMMUNICATION "thread communication"
+#define NAME_COMMUNICATION_S "thread communication s"
+#define NAME_COMMUNICATION_R "thread communication r"
+
+
+#define SOM   0xFD  /* inicio mensagem */
+#define EOM   0xFE  /* fim mensagem */
 
 #define forever for(;;)
+
+Cyg_ErrNo err;
+cyg_io_handle_t serH;
 
 extern void cmd_ini (int, char** );
 extern void monitor(void);
 
-cyg_thread thread_s[3];
-cyg_handle_t t_interface, t_processing, t_communication;
-char stack[3][STACKSIZE];
+cyg_thread thread_s[4];
+cyg_handle_t t_interface, t_processing, t_communication_s, t_communication_r;
+char stack[4][STACKSIZE];
 
 cyg_mutex_t lock_write, lock_read;
 
-cyg_handle_t mboxH1;
+cyg_handle_t mboxH1;	//Processing Thread MailBox
 
 cyg_mbox mbox1;
 
-cyg_handle_t mboxH2;
+cyg_handle_t mboxH2;	//Communication Thread MailBox
 
 cyg_mbox mbox2;
-/*
-struct command_d{
-	void (*cmd_fnct)(char *message); // podemos inserir argumentos aqui
-	char *cmd_name;
-} const commands[] ={
-	{cmd_cr,	"cr"},		// consultar relogio
-	{cmd_ar,	"ar"},		// acertar relogio 													- precisa de argumentos
-	{cmd_ctl,	"ctl"},		// consultar temperatura e luminosidade
-	{cmd_cp,	"cp"},		// consultar parametros (NREG, PMON, TSOM)
-	{cmd_mpm,	"mpm"},		// modificar perıodo de monitorizacao (segundos - 0 desactiva) 		- precisa de argumentos
-	{cmd_ca,	"ca"},		// consultar alarmes (relogio, temp., lumi., activos/inactivos)
-	{cmd_dar,	"dar"},		// definir alarme relogio											- precisa de argumentos
-	{cmd_dat,	"dat"},		// definir alarme temperatura										- precisa de argumentos
-	{cmd_dal,	"dal"},		// definir alarme luminosidade										- precisa de argumentos
-	{cmd_aa,	"aa"},		// activar/desactivar alarmes
-	{cmd_ir,	"ir"},		// informacao sobre registos (NREG, nr, iescrita, ileitura)
-	{cmd_trc,	"trc"},		// transferir n registos (ind. leit. corrente)						- precisa de argumentos
-	{cmd_tri,	"tri"},		// transferir n registos a partir do ındice i						- precisa de argumentos
-	{cmd_irl,	"irl"},		// informacao registos locais (NRBUF, nr, iescrita, ileitura)
-	{cmd_lr,	"lr"},		// listar n registos (mem. local) a partir do ındice i				- precisa de argumentos	
-	{cmd_er,	"er"},		// eliminar registos locais
-	{cmd_cpt,	"cpt"},		// consultar perıodo de transferencia
-	{cmd_mpt,	"mpt"},		// modificar perıodo de transferencia (minutos - 0 desactiva)		- precisa de argumentos
-	{cmd_lar,	"lar"},		// listar alarmes relogio entre t1 e t2								- precisa de argumentos
-	{cmd_lat,	"lat"},		// listar alarmes temperatura entre t1 e t2							- precisa de argumentos
-	{cmd_lal,	"lal"},		// listar alarmes luminosidade entre t1 e t2						- precisa de argumentos
-	{cmd_iga,	"iga"},		// informacao gestao alarmes (definicao e activacao)
-	{cmd_ig, 	"ig"}		// informacao geral (inıcio, relogio, memoria, perıodo monit.)
-};
-*/
 
 void putMSG(char *buffer, int box){
 	if(box == 0){
@@ -103,14 +82,30 @@ void processing(cyg_addrword_t data){
 	}
 }
 
-void communication(cyg_addrword_t data){
+void communication_s(cyg_addrword_t data){
 	char *buffer;
 	forever{
-
+		// After receiving a message we need to enclose it in a SOM & EOM
 		buffer = cyg_mbox_get(mboxH2);
 
 		cyg_mutex_lock(&lock_write);
-		printf("[COMMUNICATION] Talking with board %s\n", buffer);
+		printf("[COMMUNICATION_R] Receiving from board %s\n", buffer);
+		cyg_mutex_unlock(&lock_write);
+
+		cyg_thread_yield();
+
+	}
+}
+
+void communication_r(cyg_addrword_t data){
+	unsigned char buffer[50];
+	unsigned int n;
+	n=50;
+	forever{
+		err = cyg_io_read(serH, buffer, &n);
+
+		cyg_mutex_lock(&lock_write);
+		printf("[COMMUNICATION_S] Talking with board %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
 		cyg_thread_yield();
@@ -133,13 +128,15 @@ int main(void){
 
 	cyg_thread_create(PRIORITY_INTERFACE, interface, (cyg_addrword_t) NULL, NAME_INTERFACE, (void *)stack[0], STACKSIZE, &t_interface, &thread_s[0]);
 	cyg_thread_create(PRIORITY_PROCESSING, processing, (cyg_addrword_t) NULL, NAME_PROCESSING, (void *)stack[1], STACKSIZE, &t_processing, &thread_s[1]);
-	cyg_thread_create(PRIORITY_COMMUNICATION, communication, (cyg_addrword_t) NULL, NAME_COMMUNICATION, (void *)stack[2], STACKSIZE, &t_communication, &thread_s[2]);
+	cyg_thread_create(PRIORITY_COMMUNICATION, communication_s, (cyg_addrword_t) NULL, NAME_COMMUNICATION_S, (void *)stack[2], STACKSIZE, &t_communication_s, &thread_s[2]);
+	cyg_thread_create(PRIORITY_COMMUNICATION, communication_r, (cyg_addrword_t) NULL, NAME_COMMUNICATION_R, (void *)stack[3], STACKSIZE, &t_communication_r, &thread_s[3]);
 
 	// activating threads, the processing thread has to go first, otherwise inferface can takeover all the control
 	
 	cyg_thread_resume(t_processing);
 	cyg_thread_resume(t_interface);
-	cyg_thread_resume(t_communication);
+	cyg_thread_resume(t_communication_s);
+	cyg_thread_resume(t_communication_r);
 
 	exit(0);
 }
