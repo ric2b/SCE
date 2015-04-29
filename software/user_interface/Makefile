@@ -17,7 +17,7 @@ CXXFLAGS      = $(CFLAGS)
 LDFLAGS       = -nostartfiles -L$(INSTALL_DIR)/lib -Ttarget.ld
 
 #####
-OBJS= prog.o monitor.o comando.o
+OBJS= prog.o monitor.o comando.o memory.o
 
 # RULES
 
