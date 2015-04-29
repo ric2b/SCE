@@ -2,10 +2,13 @@
 #include <stdlib.h>
 #include <cyg/kernel/kapi.h>
 
-#define MAXSIZE_BUF 150
+#define NRBUF 150
+#define CLOCK_ALARM 7
+#define TEMPE_ALARM 8
+#define LUMUS_ALARM 9
 
 typedef struct _circularbuf_{
-	char data[150][8];
+	char data[NRBUF][8];
 }circularbuf;
 
 unsigned char wPointer=0;
@@ -36,7 +39,7 @@ void put_in_mem(char to_store[8]){
 	strcpy(shared_mem.data[wPointer], to_store);
 
 	wPointer++;
-	if(wPointer == 150)	//mem full
+	if(wPointer == NRBUF)	//mem full
 		wPointer = 0;
 	else
 		regWritten++;
@@ -50,7 +53,7 @@ char *read_from_mem(void){
 	cyg_mutex_lock(&lock_circularbuf);
 	strcpy(returnString, shared_mem.data[rPointer]);
 	rPointer++;
-	if(rPointer == 150)
+	if(rPointer == NRBUF)
 		rPointer = 0;
 	cyg_mutex_unlock(&lock_circularbuf);
 	
@@ -69,7 +72,7 @@ char **read_n_regs(int n){
 char **read_n_regs_from_i(int n, int i){
 	char **returnString = (char**)malloc(sizeof(char)*n);
 	int j;
-	if( n+i > MAXSIZE_BUF){
+	if( n+i > NRBUF){
 		printf("Cannot return that many regs\n");
 		return NULL;
 	}
@@ -82,5 +85,54 @@ char **read_n_regs_from_i(int n, int i){
 		cyg_mutex_unlock(&lock_circularbuf);
 	}
 	return returnString;
+}
+
+
+// to be changed to range [t1-t2]
+void getClockAlarms(void){
+	int i;
+	if(regWritten == NRBUF-1){
+		for(i=0; i < NRBUF; i++){
+			if( shared_mem.data[i][0] == CLOCK_ALARM )
+				printf("%s", shared_mem.data[i]);
+		}
+	}else{
+		for(i=0; i <= regWritten; i++){
+			if( shared_mem.data[i][0] == CLOCK_ALARM )
+				printf("%s", shared_mem.data[i]);
+		}
+	}
+}
+
+// to be changed to range [t1-t2]
+void getTempeAlarms(void){
+	int i;
+	if(regWritten == NRBUF-1){
+		for(i=0; i < NRBUF; i++){
+			if( shared_mem.data[i][0] == TEMPE_ALARM )
+				printf("%s", shared_mem.data[i]);
+		}
+	}else{
+		for(i=0; i <= regWritten; i++){
+			if( shared_mem.data[i][0] == TEMPE_ALARM )
+				printf("%s", shared_mem.data[i]);
+		}
+	}
+}
+
+// to be changed to range [t1-t2]
+void getLumusAlarms(void){
+	int i;
+	if(regWritten == NRBUF-1){
+		for(i=0; i < NRBUF; i++){
+			if( shared_mem.data[i][0] == LUMUS_ALARM )
+				printf("%s", shared_mem.data[i]);
+		}
+	}else{
+		for(i=0; i <= regWritten; i++){
+			if( shared_mem.data[i][0] == LUMUS_ALARM )
+				printf("%s", shared_mem.data[i]);
+		}
+	}
 }
 
