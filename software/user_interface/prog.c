@@ -43,6 +43,26 @@ cyg_handle_t mboxH2;	//Communication Thread MailBox
 
 cyg_mbox mbox2;
 
+void sendMSGToBoard(char *msg){
+	int n =(int) strlen(msg);
+	if( n > 100){
+		printf("String too big to safely send to board\n");
+	}else{
+		int s = 1;
+		err = cyg_io_write(serH, SOM, &s);
+		err = cyg_io_write(serH, msg, &n);
+		err = cyg_io_write(serH, EOM, &s);
+	}
+}
+
+char *getMSGfromBoard(){
+	char bufr[100];
+	int n = 100;
+	err = cyg_io_read(serH, bufr, &n);
+	
+	return bufr;
+}
+
 void putMSG(char *buffer, int box){
 	if(box == 0){
 		cyg_mbox_put(mboxH1, buffer);
@@ -89,7 +109,7 @@ void communication_s(cyg_addrword_t data){
 		buffer = cyg_mbox_get(mboxH2);
 
 		cyg_mutex_lock(&lock_write);
-		printf("[COMMUNICATION_R] Receiving from board %s\n", buffer);
+		printf("[COMMUNICATION_R] Sending to board %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
 		cyg_thread_yield();
@@ -105,7 +125,7 @@ void communication_r(cyg_addrword_t data){
 		err = cyg_io_read(serH, buffer, &n);
 
 		cyg_mutex_lock(&lock_write);
-		printf("[COMMUNICATION_S] Talking with board %s\n", buffer);
+		printf("[COMMUNICATION_S] Receiving from board %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
 		cyg_thread_yield();
