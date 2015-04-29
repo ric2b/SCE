@@ -10,15 +10,23 @@ typedef struct _circularbuf_{
 
 unsigned char wPointer=0;
 unsigned char rPointer=0;
+unsigned char regWritten=0;
 
 circularbuf shared_mem;
 
 cyg_mutex_t lock_circularbuf;
 
-void ini_cirucularbuf(void){
+void ini_circularbuf(void){
 	cyg_mutex_init(&lock_circularbuf);
 }
 
+void clear_circularbuf(void){
+	cyg_mutex_lock(&lock_circularbuf);
+	wPointer = 0;
+	rPointer = 0;
+	regWritten=0;
+	cyg_mutex_unlock(&lock_circularbuf);
+}
 
 /* puts in circular buffer a event, caller need to make sure that the data he sends fits 8 bytes */
 void put_in_mem(char to_store[8]){
@@ -30,6 +38,8 @@ void put_in_mem(char to_store[8]){
 	wPointer++;
 	if(wPointer == 150)	//mem full
 		wPointer = 0;
+	else
+		regWritten++;
 	cyg_mutex_unlock(&lock_circularbuf);
 }
 
