@@ -3,6 +3,7 @@
 #include "interrupts.h"
 #include "sensors.h"
 #include "EEPROMint.h"
+#include "communication.h"
 
 void setup(void)
 {
@@ -97,6 +98,9 @@ void setup(void)
 
 	adc_result = ReadADC() >> 6;  //get ADC result
 	lumus = adc_result/204;
+
+	/* start USART */
+	USARTinit();
 
 	/* interrupts enabled */
 	EnableHighInterrupts();

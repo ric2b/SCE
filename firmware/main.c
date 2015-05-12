@@ -40,6 +40,10 @@ volatile char pmon_counter = 0;
 volatile char updateTimeAlarm = 0;
 volatile char buzzTimer = 0;
 volatile char sleeping = 0;
+volatile char usartReadIndex = 0;
+volatile char usartReadBuf[USART_BUF_LEN];
+volatile char usartReadFlag = 0;
+
 
 void main (void)
 {
@@ -60,6 +64,15 @@ void main (void)
 			config();
 		}
 
+		if(usartReadFlag == 1)
+		{
+			usartReadFlag = 0;
+			SetDDRamAddr(0x45);
+			putcXLCD(usartReadBuf[usartReadIndex-1]);
+			PIE1bits.RCIE = 1;	// reenables USART read interrupt
+						
+		}
+
 		if(update_lumus || update_temp || updateTimeAlarm)
 			EEPROMintUpdateW();
 
@@ -72,7 +85,7 @@ void main (void)
 		if(buzzTimer == 0)
 		{
 			buzzKill();
-			Sleep();	 // cannot sleep while buzzer should be on
+			//Sleep();	 // cannot sleep while buzzer should be on
 		}
 	}
 }

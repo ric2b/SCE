@@ -45,7 +45,7 @@ void main()
 	int i;
 	char data[40];	// change to 8 or something
 	// Asynchronous mode is stopped during SLEEP.
-	OpenUSART(USART_TX_INT_OFF &
+	OpenUSART(USART_TX_INT_OFF &	
 			USART_RX_INT_ON    &
 			USART_ASYNCH_MODE  &	// NRZ format (1 start bit, 8 or 9 data bits and 1 stop bit)
 			USART_EIGHT_BIT    &	// 8 bits of data

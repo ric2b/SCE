@@ -19,13 +19,44 @@ void chooseInterrupt(void)
 		LVD_isr();	// LVD detect, so that the program can rise from the ashes
 	if(PIR1bits.TMR1IF)
 		t1_isr();
+	if(PIR1bits.RCIF)
+		USARTread_isr();	// USART read something
 	if(PIR2bits.EEIF)
 		EEwriteDisable_isr();	// wait for internal eeprom write complete
 	if(INTCONbits.INT0IF)
 		S3_isr();
 }
-
 #pragma code
+
+void USARTread_isr(void)
+{
+	char tmp;
+
+	tmp = RCREG;
+
+	if(tmp == SOM)
+	{
+		usartReadIndex = 0;
+	}
+	else if(tmp == EOM)
+	{
+		usartReadFlag = 1;
+		// The RCIF flag bit is a read only bit that is cleared by the hardware. It is cleared when the RCREG register has been read and is empty.
+		PIE1bits.RCIE = 0;	// disables USART read interrupt
+	}
+	else
+	{
+		if(usartReadIndex < USART_BUF_LEN){	
+			usartReadBuf[usartReadIndex] = tmp;
+			usartReadIndex++;
+		}
+	}
+
+	// dummy code to see USART read interrupt
+	TRISBbits.TRISB1 = 0;
+	PORTBbits.RB1 = 1;
+}
+
 void t1_isr (void)
 {
 	WriteTimer1(0x8000);       // reload timer: 1 second : 0x8000

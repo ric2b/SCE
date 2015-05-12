@@ -8,4 +8,6 @@ void S3_isr (void);
 void LVD_isr(void);
 void EEwriteDisable_isr(void);
 void DisableHighInterrupts(void);
+void USARTread_isr(void);
+
 #endif
