@@ -98,6 +98,7 @@ extern volatile char sleeping;
 extern volatile char usartReadIndex;
 extern volatile char usartReadBuf[USART_BUF_LEN];
 extern volatile char usartReadFlag;
+extern volatile char usartWriteFlag;
 
 
 /*----- EEPROM VARIABLES ---------------*/

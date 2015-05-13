@@ -9,6 +9,7 @@
 #include "configMode.h"
 #include "buzzer.h"
 #include "alarms.h"
+#include "communication.h"
 #include "EEPROMint.h"
 
 /* ----------- GLOBALS ---------------*/
@@ -43,6 +44,7 @@ volatile char sleeping = 0;
 volatile char usartReadIndex = 0;
 volatile char usartReadBuf[USART_BUF_LEN];
 volatile char usartReadFlag = 0;
+volatile char usartWriteFlag = 0;
 
 
 void main (void)
@@ -64,13 +66,18 @@ void main (void)
 			config();
 		}
 
-		if(usartReadFlag == 1)
+		if(usartReadFlag)
 		{
 			usartReadFlag = 0;
 			SetDDRamAddr(0x45);
 			putcXLCD(usartReadBuf[usartReadIndex-1]);
 			PIE1bits.RCIE = 1;	// reenables USART read interrupt
-						
+			usartWriteFlag = 1;
+		}
+		if(usartWriteFlag)
+		{
+			serialWrite(usartReadBuf, usartReadIndex);
+			usartWriteFlag = 0;
 		}
 
 		if(update_lumus || update_temp || updateTimeAlarm)

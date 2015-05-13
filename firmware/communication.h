@@ -2,6 +2,6 @@
 #define USART
 
 void USARTinit (void);
-void USARTwrite(char c);
+void serialWrite(char c[],int n);
 
 #endif

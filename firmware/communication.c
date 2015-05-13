@@ -32,8 +32,16 @@ void USARTinit (void)
 	   */
 }
 
-void USARTwrite(char c)
+void serialWrite(char c[],int n)
 {
+	int i;
 	while (BusyUSART());
-	putcUSART(c);              
+	putcUSART(0xfd);
+	for(i=0; i<n; i++)
+	{
+		while (BusyUSART());
+		putcUSART(c[i]);              
+	}
+	while (BusyUSART());
+	putcUSART(0xfe);
 }
