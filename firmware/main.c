@@ -71,12 +71,13 @@ void main (void)
 			usartReadFlag = 0;
 			SetDDRamAddr(0x45);
 			putcXLCD(usartReadBuf[usartReadIndex-1]);
+			processMessage((char*)usartReadBuf, (char)usartReadIndex);	
 			PIE1bits.RCIE = 1;	// reenables USART read interrupt
-			usartWriteFlag = 1;
+			//usartWriteFlag = 1;
 		}
 		if(usartWriteFlag)
 		{
-			serialWrite(usartReadBuf, usartReadIndex);
+			serialWrite((char*)usartReadBuf, (char)usartReadIndex);
 			usartWriteFlag = 0;
 		}
 
