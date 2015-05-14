@@ -1,6 +1,7 @@
 #include <p18f452.h>
 #include <usart.h>
 #include "main.h"
+#include "interrupts.h"
 
 volatile char intUSART, charUSART;
 
@@ -35,6 +36,7 @@ void USARTinit (void)
 void serialWrite(char c[], char n)
 {
 	int i;
+	DisableHighInterrupts();
 	while (BusyUSART());
 	putcUSART(SOM);
 	for(i=0; i<n; i++)
@@ -44,16 +46,19 @@ void serialWrite(char c[], char n)
 	}
 	while (BusyUSART());
 	putcUSART(EOM);
+	EnableHighInterrupts();
 }
 
 void serialWriteChar(char c)
 {
+	DisableHighInterrupts();
 	while (BusyUSART());
 	putcUSART(SOM);
 	while (BusyUSART());
 	putcUSART(c);
 	while (BusyUSART());
 	putcUSART(EOM);
+	EnableHighInterrupts();
 }
 
 void processMessage(char inBuffer[], char size)
@@ -63,14 +68,28 @@ void processMessage(char inBuffer[], char size)
 	{
 		case CRLG:
 			serialWriteChar(CMD_OK);
+			DisableHighInterrupts();
 			tmp[0]=clock.hours;
 			tmp[1]=clock.minutes;
 			tmp[2]=clock.seconds;
+			EnableHighInterrupts();
 			serialWrite(tmp, 3);
 			break;
 
 		case ARLG:
-			serialWriteChar(CMD_OK);
+			if(size == 4)
+				serialWriteChar(CMD_OK);
+			else
+			{
+				serialWriteChar(CMD_ERRO);
+				return;
+			}
+			DisableHighInterrupts();
+			clock.hours = inBuffer[1];
+			clock.minutes = inBuffer[2];
+			clock.seconds = inBuffer[3];
+			EnableHighInterrupts();
+			update_seconds = update_minutes = update_hours = 1;
 			break;
 
 		case CTEL:
@@ -90,6 +109,7 @@ void processMessage(char inBuffer[], char size)
 
 		case MPMN:
 			serialWriteChar(CMD_OK);
+			PMON = inBuffer[1];
 			break;
 
 		case CALA:
@@ -108,18 +128,35 @@ void processMessage(char inBuffer[], char size)
 
 		case DALR:
 			serialWriteChar(CMD_OK);
+			alarm.hours = inBuffer[1];
+			alarm.minutes = inBuffer[2];
+			alarm.seconds = inBuffer[3];
 			break;
 
 		case DALT:
 			serialWriteChar(CMD_OK);
+			temperature_threshold = inBuffer[1];
 			break;
 
 		case DALL:
 			serialWriteChar(CMD_OK);
+			lumus_threshold = inBuffer[1];
 			break;
 
 		case AALA:
 			serialWriteChar(CMD_OK);
+    		SetDDRamAddr(0x0d);  			
+			if(alarmMask == 0)
+  			{
+				putcXLCD('A');
+				alarmMask = 7; // all alarms on
+			}
+			else
+			{
+				putcXLCD('a');				
+				alarmMask = 0;
+			}
+			SetDDRamAddr(0x50);			
 			break;
 
 		case IREG:

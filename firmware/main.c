@@ -46,6 +46,7 @@ volatile char usartReadBuf[USART_BUF_LEN];
 volatile char usartReadFlag = 0;
 volatile char usartWriteFlag = 0;
 
+char PMON = 5;
 
 void main (void)
 {
@@ -73,12 +74,6 @@ void main (void)
 			putcXLCD(usartReadBuf[usartReadIndex-1]);
 			processMessage((char*)usartReadBuf, (char)usartReadIndex);	
 			PIE1bits.RCIE = 1;	// reenables USART read interrupt
-			//usartWriteFlag = 1;
-		}
-		if(usartWriteFlag)
-		{
-			serialWrite((char*)usartReadBuf, (char)usartReadIndex);
-			usartWriteFlag = 0;
 		}
 
 		if(update_lumus || update_temp || updateTimeAlarm)

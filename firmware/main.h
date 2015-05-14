@@ -21,7 +21,8 @@
 #define F_CPU 4000	// in kHz. used when in debug mode
 #endif
 
-#define PMON 5
+//#define PMON 5
+extern char PMON;
 #define TSOM 1
 #define NREG 6
 
