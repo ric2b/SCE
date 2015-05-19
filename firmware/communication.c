@@ -64,6 +64,8 @@ void serialWriteChar(char c)
 void processMessage(char inBuffer[], char size)
 {
 	char tmp[6];
+	int i;
+	
 	switch(inBuffer[0])
 	{
 		case CRLG:
@@ -161,10 +163,41 @@ void processMessage(char inBuffer[], char size)
 
 		case IREG:
 			serialWriteChar(CMD_OK);
+			
+			tmp[0] = NREG;
+			tmp[1] = (char)numberEvents;
+			tmp[2] = (char)writerPointer;
+			tmp[3] = (char)readerPointer;
+
+			serialWrite(tmp, 4);
+
 			break;
 
 		case TRGC:
 			serialWriteChar(CMD_OK);
+
+			DisableHighInterrupts();
+			while (BusyUSART());
+			putcUSART(SOM);
+
+			if(inBuffer[1] <= 12){
+				for(i = 0; i < inBuffer[1]; i++)
+				{
+					for(j = 0; j<8; j++)
+					{
+						while (BusyUSART());
+						putcUSART(readFromEEPROM(readerPointer+j));
+					}
+					readerPointer+=8;
+					if 
+				}
+			}
+			else
+				putcUSART(CMD_ERRO);
+
+ 			while (BusyUSART());
+			putcUSART(EOM);
+			EnableHighInterrupts();
 			break;
 
 		case TRGI:
