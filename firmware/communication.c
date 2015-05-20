@@ -2,6 +2,7 @@
 #include <usart.h>
 #include "main.h"
 #include "interrupts.h"
+#include "eeprom.h"
 
 volatile char intUSART, charUSART;
 
@@ -64,8 +65,9 @@ void serialWriteChar(char c)
 void processMessage(char inBuffer[], char size)
 {
 	char tmp[6];
-	int i;
-	
+	int i, j;
+	int varNREG = NREG;
+
 	switch(inBuffer[0])
 	{
 		case CRLG:
@@ -181,18 +183,18 @@ void processMessage(char inBuffer[], char size)
 			putcUSART(SOM);
 
 			if(inBuffer[1] <= 12){
-				for(i = 0; i < inBuffer[1]; i++)
+				for(i = 0; i < inBuffer[1] && i < (char)numberEvents; i++)
 				{
 					for(j = 0; j<8; j++)
 					{
 						while (BusyUSART());
 						putcUSART(readFromEEPROM(readerPointer+j));
 					}
-					readerPointer+=8;
-					if 
+					readerPointer += 8;
+					if(readerPointer >= (varNREG << 3))
+						readerPointer = 0;
 				}
-			}
-			else
+			}else
 				putcUSART(CMD_ERRO);
 
  			while (BusyUSART());
@@ -202,6 +204,25 @@ void processMessage(char inBuffer[], char size)
 
 		case TRGI:
 			serialWriteChar(CMD_OK);
+
+			DisableHighInterrupts();
+			
+			if(inBuffer[1] + inBuffer[2] > varNREG << 3){
+				for(i = inBuffer[2]; i < inBuffer[1] + inBuffer[2] && i < (char)numberEvents; i++)
+				{
+					if ( i >= varNREG)
+						break;
+					for(j=0; j<8; j++)
+					{
+						while(BusyUSART());
+						putcUSART(readFromEEPROM(i+j));
+					}
+				}
+			}
+
+			while(BusyUSART());
+			putcUSART(EOM);
+			EnableHighInterrupts();
 			break;
 
 		case NMCH:

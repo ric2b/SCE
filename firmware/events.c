@@ -85,7 +85,7 @@ void addToEEPROM(int code){
 	else
 		numberEvents++;
 
-	if(numberEvents > NREG>>1) //if more than NREG/2 events are stored
+	if(numberEvents > varNREG>>1) //if more than NREG/2 events are stored
 	{
 		SetDDRamAddr(0x47);
 		putcXLCD('M');

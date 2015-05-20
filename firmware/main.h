@@ -23,14 +23,14 @@
 
 //#define PMON 5
 extern char PMON;
-#define TSOM 1
-#define NREG 6
+extern char TSOM;
+extern char NREG;
 
 
-#define writerEEPROM 0x7FF8
-#define readerEEPROM 0x7FFA
-#define NREGEEPROM 0x7FFC
-#define usedEEPROM 0x7FFE
+#define writerEEPROM 0x7FF8		/* posicao onde o writerPointer e guardado */
+#define readerEEPROM 0x7FFA		/* posicao onde o readerPointer e guardado */
+#define NREGEEPROM 0x7FFC		/* posicao onde NREG e guardado */
+#define usedEEPROM 0x7FFE		/* posicao onde esta guardado o numero de eventos guardados */
 
 #define TIME_BAK_ADDR 0x10
 #define VAR_BAK_ADDR 0x20

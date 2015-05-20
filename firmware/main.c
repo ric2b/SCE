@@ -47,6 +47,8 @@ volatile char usartReadFlag = 0;
 volatile char usartWriteFlag = 0;
 
 char PMON = 5;
+char TSOM = 1;
+char NREG = 30;
 
 void main (void)
 {
