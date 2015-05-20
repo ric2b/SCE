@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <cyg/kernel/kapi.h>
 #include <cyg/io/io.h>
+#include <unistd.h>
 
 #define NR_THREADS 3
 #define PRIORITY_INTERFACE 10
@@ -45,17 +46,18 @@ cyg_mbox mbox2;
 
 void sendMSGToBoard(char *msg){
 	int n =(int) strlen(msg);
-	if( n > 100){
+	if( n > 98){
 		printf("String too big to safely send to board\n");
 	}else{
-		int s = 1;
-		err = cyg_io_write(serH, SOM, &s);
+		printf("sending msg to board\n");
+		char buffer[100];
+		memset(buffer, 0, 100);
+		sprintf(buffer, "%d%s%d", SOM, msg, EOM);
 		err = cyg_io_write(serH, msg, &n);
-		err = cyg_io_write(serH, EOM, &s);
 	}
 }
 
-char *getMSGfromBoard(){
+char *getMSGfromBoard(void){
 	char bufr[100];
 	int n = 100;
 	err = cyg_io_read(serH, bufr, &n);
@@ -112,6 +114,8 @@ void communication_s(cyg_addrword_t data){
 		printf("[COMMUNICATION_R] Sending to board %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
+		sendMSGToBoard(buffer);
+
 		cyg_thread_yield();
 
 	}
@@ -158,5 +162,6 @@ int main(void){
 	cyg_thread_resume(t_communication_s);
 	cyg_thread_resume(t_communication_r);
 
+	puts("");
 	exit(0);
 }
