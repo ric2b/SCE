@@ -49,10 +49,14 @@ void sendMSGToBoard(char *msg){
 	if( n > 98){
 		printf("String too big to safely send to board\n");
 	}else{
-		printf("sending msg to board\n");
 		char buffer[100];
 		memset(buffer, 0, 100);
-		sprintf(buffer, "%d%s%d", SOM, msg, EOM);
+		//sprintf(buffer, "%c%c%c", SOM, (unsigned int) msg[0], EOM);
+		buffer[0] = SOM;
+		buffer[1] = msg[0];
+		buffer[2] = EOM;
+		printf("sending msg to board %s\n", buffer);
+		n= 3;	// CHANGE THIS
 		err = cyg_io_write(serH, msg, &n);
 	}
 }

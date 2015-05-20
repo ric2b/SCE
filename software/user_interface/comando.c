@@ -41,7 +41,9 @@ extern void putMSG(char *buffer, int box); // Communication thread -> box == 1
 void cmd_cr (int argc, char **argv)
 {
 	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", CRLG);		// can also use %02x
+	//sprintf(buffer, "%x", CRLG);		// can also use %02x
+	buffer[0] = CRLG;
+	buffer[1] = 0;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
