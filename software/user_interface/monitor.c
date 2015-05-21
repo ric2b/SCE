@@ -57,14 +57,14 @@ struct 	command_d {
 	char*	cmd_name;
 	char*	cmd_help;
 } const commands[] = {
-	{cmd_sos,  "sos","                 help"},
-	{cmd_sair, "sair","                sair"},
-	{cmd_ini,  "ini","<d>              inicializar dispositivo (0/1) ser0/ser1"},
-	{cmd_ems,  "ems","<str>            enviar mensagem (string)"},
-	{cmd_emh,  "emh","<h1> <h2> <...>  enviar mensagem (hexadecimal)"},
-	{cmd_rms,  "rms","<n>              receber mensagem (string)"},
-	{cmd_rmh,  "rmh","<n>              receber mensagem (hexadecimal)"},
-	{cmd_test, "teste","<arg1> <arg2>  comando de teste"},
+	{cmd_sos,  	"sos","                 help"},
+	{cmd_sair, 	"sair","                sair"},
+	{cmd_ini,  	"ini","<d>              inicializar dispositivo (0/1) ser0/ser1"},
+	{cmd_ems,  	"ems","<str>            enviar mensagem (string)"},
+	{cmd_emh,  	"emh","<h1> <h2> <...>  enviar mensagem (hexadecimal)"},
+	{cmd_rms,  	"rms","<n>              receber mensagem (string)"},
+	{cmd_rmh,  	"rmh","<n>              receber mensagem (hexadecimal)"},
+	{cmd_test, 	"teste","<arg1> <arg2>  comando de teste"},
 	{cmd_cr,	"cr","                  consultar relogio"},
 	{cmd_ar,	"ar","<h> <m> <s>       acertar relogio"},
 	{cmd_ctl,	"ctl","                 consultar temp e lum"},
@@ -94,6 +94,8 @@ struct 	command_d {
 #define ARGVECSIZE 10
 #define MAX_LINE   50
 
+#define forever for(;;)
+
 /*-------------------------------------------------------------------------+
   | Function: cmd_sos - provides a rudimentary help
   +--------------------------------------------------------------------------*/ 
@@ -120,7 +122,8 @@ int my_getline (char** argv, int argvsize)
 	/* Break command line into an o.s. like argument vector,
 	   i.e. compliant with the (int argc, char **argv) specification --------*/
 
-	for (argc=0,p=line; (*line != '\0') && (argc < argvsize); p=NULL,argc++) {
+	for (argc=0,p=line; (*line != '\0') && (argc < argvsize); p=NULL,argc++) 
+	{
 		p = strtok(p, " \t\n");
 		argv[argc] = p;
 		if (p == NULL) return argc;
@@ -138,7 +141,8 @@ void monitor (void)
 	int argc, i;
 
 	printf("%s Type sos for help\n", TitleMsg);
-	for (;;) {
+	forever 
+	{
 		printf("\nCmd> ");
 		/* Reading and parsing command line  ----------------------------------*/
 		if ((argc = my_getline(argv, ARGVECSIZE)) > 0) {
@@ -152,7 +156,7 @@ void monitor (void)
 				cyg_thread_yield();
 			}
 			else  
-				printf("%s", InvalMsg);
+				puts(InvalMsg);
 		} /* if my_getline */
 	} /* forever */
 }
