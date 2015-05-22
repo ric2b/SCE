@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cyg/kernel/kapi.h>
 
 #define NRBUF 150
@@ -31,7 +32,7 @@ void clear_circularbuf(void){
 	int i;
 	cyg_mutex_lock(&lock_circularbuf);
 	for(i=0; i< NRBUF; i++){
-		memset(data[i], 0,8);
+		memset(shared_mem.data[i], 0,8);
 	}
 	wPointer = 0;
 	rPointer = 0;
@@ -108,38 +109,74 @@ void getClockAlarms(int h1, int m1, int s1, int h2, int m2, int s2){
 	if(regWritten == NRBUF-1){								// if we have all the memory full, we can go up to NRBUF
 		for(i=0; i < NRBUF; i++){
 			if( shared_mem.data[i][3] == CLOCK_ALARM )		// check for code, has to be a clock alarm
+			{
 				if(shared_mem.data[i][0] < h2 && shared_mem.data[i][0] > h1) // if hour is between both requested times, OK!
+				{
 					printf("%s", shared_mem.data[i]);
+				}
 				else if(shared_mem.data[i][0] == h2)		// if not, then check for equal hours for upper bound
+				{
 					if(shared_mem.data[i][1] < m2)			// if h = h2, then we need to check for minutes, if m < m2, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m2)	// if not, then check for equal minutes for upper bound
+					{
 						if(shared_mem.data[i][2] <= s2)		// if m = m2, then s <= s2 for us to print
 							printf("%s", shared_mem.data[i]);
+					}
+				}
 				else if(shared_mem.data[i][0] == h1)		// if not, then check for equal hours for lower bound
+				{
 					if(shared_mem.data[i][1] > m1)			// if h = h1, then we need to check for minutes, if m > m1, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m1)	// if not, then check for equal minutes for lower bound
+					{
 						if(shared_mem.data[i][2] >= s1)		// if m = m1, then s >= s1 for us to print
+						{
 							printf("%s", shared_mem.data[i]);
+						}
+					}
+				}
+			}
 		}
 	}else{
 		for(i=0; i <= regWritten; i++){						// if we dont have all the memory full, we can only read up to regWritten
 			if( shared_mem.data[i][3] == CLOCK_ALARM )		// check for code, has to be a clock alarm
+			{
 				if(shared_mem.data[i][0] < h2 && shared_mem.data[i][0] > h1) // if hour is between both requested times, OK!
+				{
 					printf("%s", shared_mem.data[i]);
+				}
 				else if(shared_mem.data[i][0] == h2)		// if not, then check for equal hours for upper bound
+				{
 					if(shared_mem.data[i][1] < m2)			// if h = h2, then we need to check for minutes, if m < m2, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m2)	// if not, then check for equal minutes for upper bound
+					{
 						if(shared_mem.data[i][2] <= s2)		// if m = m2, then s <= s2 for us to print
 							printf("%s", shared_mem.data[i]);
+					}
+				}
 				else if(shared_mem.data[i][0] == h1)		// if not, then check for equal hours for lower bound
+				{
 					if(shared_mem.data[i][1] > m1)			// if h = h1, then we need to check for minutes, if m > m1, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m1)	// if not, then check for equal minutes for lower bound
+					{
 						if(shared_mem.data[i][2] >= s1)		// if m = m1, then s >= s1 for us to print
+						{
 							printf("%s", shared_mem.data[i]);
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -151,37 +188,74 @@ void getTempeAlarms(int h1, int m1, int s1, int h2, int m2, int s2){
 	if(regWritten == NRBUF-1){
 		for(i=0; i < NRBUF; i++){
 			if( shared_mem.data[i][3] == TEMPE_ALARM )		// same as clock alarm, but different code
+			{
 				if(shared_mem.data[i][0] < h2 && shared_mem.data[i][0] > h1) // if hour is between both requested times, OK!
+				{
 					printf("%s", shared_mem.data[i]);
+				}
 				else if(shared_mem.data[i][0] == h2)		// if not, then check for equal hours for upper bound
+				{
 					if(shared_mem.data[i][1] < m2)			// if h = h2, then we need to check for minutes, if m < m2, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m2)	// if not, then check for equal minutes for upper bound
+					{
 						if(shared_mem.data[i][2] <= s2)		// if m = m2, then s <= s2 for us to print
 							printf("%s", shared_mem.data[i]);
+					}
+				}
 				else if(shared_mem.data[i][0] == h1)		// if not, then check for equal hours for lower bound
+				{
 					if(shared_mem.data[i][1] > m1)			// if h = h1, then we need to check for minutes, if m > m1, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m1)	// if not, then check for equal minutes for lower bound
+					{
 						if(shared_mem.data[i][2] >= s1)		// if m = m1, then s >= s1 for us to print
+						{
 							printf("%s", shared_mem.data[i]);
+						}
+					}
+				}
+			}
+		}
 	}else{
 		for(i=0; i <= regWritten; i++){
 			if( shared_mem.data[i][3] == TEMPE_ALARM )
+			{
 				if(shared_mem.data[i][0] < h2 && shared_mem.data[i][0] > h1) // if hour is between both requested times, OK!
+				{
 					printf("%s", shared_mem.data[i]);
+				}
 				else if(shared_mem.data[i][0] == h2)		// if not, then check for equal hours for upper bound
+				{
 					if(shared_mem.data[i][1] < m2)			// if h = h2, then we need to check for minutes, if m < m2, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m2)	// if not, then check for equal minutes for upper bound
+					{
 						if(shared_mem.data[i][2] <= s2)		// if m = m2, then s <= s2 for us to print
 							printf("%s", shared_mem.data[i]);
+					}
+				}
 				else if(shared_mem.data[i][0] == h1)		// if not, then check for equal hours for lower bound
+				{
 					if(shared_mem.data[i][1] > m1)			// if h = h1, then we need to check for minutes, if m > m1, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m1)	// if not, then check for equal minutes for lower bound
+					{
 						if(shared_mem.data[i][2] >= s1)		// if m = m1, then s >= s1 for us to print
+						{
 							printf("%s", shared_mem.data[i]);
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -193,38 +267,74 @@ void getLumusAlarms(int h1, int m1, int s1, int h2, int m2, int s2){
 	if(regWritten == NRBUF-1){
 		for(i=0; i < NRBUF; i++){
 			if( shared_mem.data[i][3] == LUMUS_ALARM )		// same as alarm clock but different code
+			{
 				if(shared_mem.data[i][0] < h2 && shared_mem.data[i][0] > h1) // if hour is between both requested times, OK!
+				{
 					printf("%s", shared_mem.data[i]);
+				}
 				else if(shared_mem.data[i][0] == h2)		// if not, then check for equal hours for upper bound
+				{
 					if(shared_mem.data[i][1] < m2)			// if h = h2, then we need to check for minutes, if m < m2, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m2)	// if not, then check for equal minutes for upper bound
+					{
 						if(shared_mem.data[i][2] <= s2)		// if m = m2, then s <= s2 for us to print
 							printf("%s", shared_mem.data[i]);
+					}
+				}
 				else if(shared_mem.data[i][0] == h1)		// if not, then check for equal hours for lower bound
+				{
 					if(shared_mem.data[i][1] > m1)			// if h = h1, then we need to check for minutes, if m > m1, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m1)	// if not, then check for equal minutes for lower bound
+					{
 						if(shared_mem.data[i][2] >= s1)		// if m = m1, then s >= s1 for us to print
+						{
 							printf("%s", shared_mem.data[i]);
+						}
+					}
+				}
+			}
 		}
 	}else{
 		for(i=0; i <= regWritten; i++){
 			if( shared_mem.data[i][3] == LUMUS_ALARM )
+			{
 				if(shared_mem.data[i][0] < h2 && shared_mem.data[i][0] > h1) // if hour is between both requested times, OK!
+				{
 					printf("%s", shared_mem.data[i]);
+				}
 				else if(shared_mem.data[i][0] == h2)		// if not, then check for equal hours for upper bound
+				{
 					if(shared_mem.data[i][1] < m2)			// if h = h2, then we need to check for minutes, if m < m2, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m2)	// if not, then check for equal minutes for upper bound
+					{
 						if(shared_mem.data[i][2] <= s2)		// if m = m2, then s <= s2 for us to print
 							printf("%s", shared_mem.data[i]);
+					}
+				}
 				else if(shared_mem.data[i][0] == h1)		// if not, then check for equal hours for lower bound
+				{
 					if(shared_mem.data[i][1] > m1)			// if h = h1, then we need to check for minutes, if m > m1, OK!
+					{
 						printf("%s", shared_mem.data[i]);
+					}
 					else if(shared_mem.data[i][1] == m1)	// if not, then check for equal minutes for lower bound
+					{
 						if(shared_mem.data[i][2] >= s1)		// if m = m1, then s >= s1 for us to print
+						{
 							printf("%s", shared_mem.data[i]);
+						}
+					}
+				}
+			}
 		}
 	}
 }
