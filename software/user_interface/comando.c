@@ -34,6 +34,8 @@ cyg_io_handle_t serH;
 #define PROCESSING_THREAD 0
 
 extern void putMSG(char *buffer, int box); // Communication thread -> box == 1
+extern void setPerTransferencia(char a);
+extern char char getPerTransferencia(void);
 
 /*-------------------------------------------------------------------------+
 | Function: cmd_cr - Consultar relogio
@@ -208,80 +210,145 @@ void cmd_tri (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_irl (int argc, char **argv)
 {
-	// TO BE CHECKED
+	getLocalReg();
 	return;
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_lr
+| Function: cmd_lr - listar n registos locais a partir do indice i
 +--------------------------------------------------------------------------*/ 
 void cmd_lr (int argc, char **argv)
 {
+	int n;
+	int i;
+	char **all_reg;
+	int j;
+
+	if( argc < 3)
+		printf("Not enough arguments to lr\n");
+
+	sscanf(argv[1], "%d", &n);
+	sscanf(argv[2], "%d", &i);
+	all_reg = read_n_regs_from_i(n,i);
+
+	printf("Registers from %d:\n", i);
+	for(j=0; j< n; j++){
+		printf("[REG %d] - %s", j,all_reg[j]);
+	}
+
 	return;
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_er
+| Function: cmd_er - eliminar registos locais
 +--------------------------------------------------------------------------*/ 
 void cmd_er (int argc, char **argv)
 {
-  exit(0);
+	clear_circularbuf();
+	return;
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_cpt
+| Function: cmd_cpt - consultar período de transferência
 +--------------------------------------------------------------------------*/ 
 void cmd_cpt (int argc, char **argv)
 {
-  exit(0);
+	printf("Periodo de transferência: %c", getPerTransferencia());
+	return;
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_mpt
+| Function: cmd_mpt - modificar período de transferência
 +--------------------------------------------------------------------------*/ 
 void cmd_mpt (int argc, char **argv)
 {
-  exit(0);
+	int new_monit_time=0;
+	if( argc <2){
+		printf("Not enough arguments to mpt\n");
+		return;
+	}
+
+	sscanf(argv[1], "%d", new_monit_time);
+
+	setPerTransferencia((char) new_monit_time);
+	return;
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_lar
+| Function: cmd_lar - listar alarmes de relógio entre t1 e t2
 +--------------------------------------------------------------------------*/ 
 void cmd_lar (int argc, char **argv)
 {
-  exit(0);
+	int h1,m1,s1,h2,m2,s2;
+
+	if(argc < 7){
+		printf("Not enough arguments for lar\n");
+		return;
+	}
+	sscanf(argv[1], "%d", h1);
+	sscanf(argv[2], "%d", m1);
+	sscanf(argv[3], "%d", s1);
+	sscanf(argv[4], "%d", h2);
+	sscanf(argv[5], "%d", m2);
+	sscanf(argv[6], "%d", s2);
+	getClockAlarms(h1,m1,s1,h2,m2,s2);
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_lat
+| Function: cmd_lat - listar alarmes de temperatura entre t1 e t2
 +--------------------------------------------------------------------------*/ 
 void cmd_lat (int argc, char **argv)
 {
-  exit(0);
+	int h1,m1,s1,h2,m2,s2;
+
+	if(argc < 7){
+		printf("Not enough arguments for lar\n");
+		return;
+	}
+	sscanf(argv[1], "%d", h1);
+	sscanf(argv[2], "%d", m1);
+	sscanf(argv[3], "%d", s1);
+	sscanf(argv[4], "%d", h2);
+	sscanf(argv[5], "%d", m2);
+	sscanf(argv[6], "%d", s2);
+	getTempeAlarms(h1,m1,s1,h2,m2,s2);
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_lal
+| Function: cmd_lal - listar alarmes de luminosidade entre t1 e t2
 +--------------------------------------------------------------------------*/ 
 void cmd_lal (int argc, char **argv)
 {
-  exit(0);
+	int h1,m1,s1,h2,m2,s2;
+
+	if(argc < 7){
+		printf("Not enough arguments for lar\n");
+		return;
+	}
+	sscanf(argv[1], "%d", h1);
+	sscanf(argv[2], "%d", m1);
+	sscanf(argv[3], "%d", s1);
+	sscanf(argv[4], "%d", h2);
+	sscanf(argv[5], "%d", m2);
+	sscanf(argv[6], "%d", s2);
+	getTempeAlarms(h1,m1,s1,h2,m2,s2);
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_iga
+| Function: cmd_iga - informação geral de alarmes (activacao e desativacao)
 +--------------------------------------------------------------------------*/ 
 void cmd_iga (int argc, char **argv)
 {
-  exit(0);
+	infoGestaoAlarms();
 }
 
 /*-------------------------------------------------------------------------+
-| Function: cmd_ig
+| Function: cmd_ig - informacao geral (inicio, relogio, memoria, periodo de monit)
 +--------------------------------------------------------------------------*/ 
 void cmd_ig (int argc, char **argv)
 {
-  exit(0);
+
+	return;
 }
 
 /*-------------------------------------------------------------------------+

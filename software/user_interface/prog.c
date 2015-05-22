@@ -30,6 +30,8 @@ cyg_io_handle_t serH;
 extern void cmd_ini (int, char** );
 extern void monitor(void);
 
+char periodo_transferencia;
+
 cyg_thread thread_s[4];
 cyg_handle_t t_interface, t_processing, t_communication_s, t_communication_r;
 char stack[4][STACKSIZE];
@@ -43,6 +45,19 @@ cyg_mbox mbox1;
 cyg_handle_t mboxH2;	//Communication Thread MailBox
 
 cyg_mbox mbox2;
+
+/* definir periodo de transferencia */
+
+void setPerTransferencia(char a){
+	periodo_transferencia = a;
+	return;
+}
+
+/* get periodo de transferencia, as outras funcoes nao tem acesso directo a esta informacao*/
+
+char getPerTransferencia(void){
+	return periodo_transferencia;
+}
 
 /* send a message to the board. limited to 98 bytes */
 void sendMSGToBoard(char *msg, char size){
@@ -166,6 +181,9 @@ void communication_r(cyg_addrword_t data){
 }
 
 int main(void){
+
+	periodo_transferencia=0;
+
 	// initializing mutex's
 
 	cyg_mutex_init(&lock_write);

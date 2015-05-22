@@ -7,6 +7,7 @@
 #define CLOCK_ALARM 7
 #define TEMPE_ALARM 8
 #define LUMUS_ALARM 9
+#define MONIT_ALARM 6
 
 typedef struct _circularbuf_{
 	char data[NRBUF][8];
@@ -341,5 +342,24 @@ void getLumusAlarms(int h1, int m1, int s1, int h2, int m2, int s2){
 
 void getLocalReg(void){
 	printf("NRBUF - %d | nr - %d | iescrita %d | ileitura %d", NRBUF, regWritten, wPointer, rPointer);
+}
+
+void infoGestaoAlarms(void){
+		int i;
+	if(regWritten == NRBUF-1){
+		for(i=0; i < NRBUF; i++){
+			if( shared_mem.data[i][3] == MONIT_ALARM )		// only monitorization alarms (definition and deactivation)
+			{
+				printf("%s", shared_mem.data[i]);
+			}
+		}
+	}else{
+		for(i=0; i <= regWritten; i++){
+			if( shared_mem.data[i][3] == MONIT_ALARM )		// only monitorization alarms (definition and deactivation)
+			{
+				printf("%s", shared_mem.data[i]);
+			}
+		}
+	}
 }
 
