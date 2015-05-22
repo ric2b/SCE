@@ -1,0 +1,69 @@
+\documentclass[a4paper]{article}
+
+\usepackage{tecnico_relatorio}
+
+\usepackage{textcomp}
+\usepackage[hypcap]{caption} % makes \ref point to top of figures and tables
+%\usepackage{rotating}
+\usepackage{float}
+\usepackage[nottoc]{tocbibind}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[justification=centering]{caption}
+\usepackage{listings}
+\usepackage{indentfirst} % indent first paragraph in section
+
+\begin{document}
+	\trSetImage{img/tecnico_logo}{6cm} % Logotipo do Técnico
+    
+    \trSetCourse{Mestrado em Engenharia Electrotécnica \\e de Computadores}
+    
+	\trSetSubject{Sistemas Computacionais Embebidos}
+	
+	\trSetType{2ª Parte}
+
+	\trSetTitle{Sistema de Monitorização e Alarme}
+
+	\trSetBoxStyle{0.3}
+
+	\trSetGroupNo{Grupo 6}
+
+	\trSetAuthorNr{3}
+
+	\trSetAuthors
+	{
+		\begin{center}
+			Gonçalo Ribeiro
+
+			73294
+		\end{center}
+	}{
+		\begin{center}
+			Francisco Leal
+
+			72939
+		\end{center}
+	}{
+		\begin{center}
+			Ricardo Amendoeira
+
+			73373
+		\end{center}
+	}
+
+	\trSetProfessor{Prof. Carlos Almeida}
+
+	\trMakeCover
+
+	\tableofcontents
+	\pagenumbering{gobble}
+
+	\pagebreak
+
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+
+
+
+
+\end{document}
