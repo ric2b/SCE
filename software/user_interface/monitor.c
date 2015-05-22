@@ -46,8 +46,6 @@ extern void cmd_iga (int, char** );			// 28
 extern void cmd_ig (int, char** );			// 29
 void cmd_sos  (int, char** );
 
-
-extern char *getMSG(int box);
 extern void putMSG(char *buffer, int box);
 #define PROCESSING_BOX 0
 
@@ -70,6 +68,8 @@ struct 	command_d {
 	{cmd_rms,  	"rms","<n>              receber mensagem (string)"},
 	{cmd_rmh,  	"rmh","<n>              receber mensagem (hexadecimal)"},
 	{cmd_test, 	"teste","<arg1> <arg2>  comando de teste"},
+
+	// funcoes thread de comunicacao
 	{cmd_cr,	"cr","                  consultar relogio"},
 	{cmd_ar,	"ar","<h> <m> <s>       acertar relogio"},
 	{cmd_ctl,	"ctl","                 consultar temp e lum"},
@@ -83,9 +83,13 @@ struct 	command_d {
 	{cmd_ir,	"ir","                  informacao sobre registos"},
 	{cmd_trc,	"trc","<n>              transferir n registos"},
 	{cmd_tri,	"tri","<n> <i>          transferir n registos a partir de i"},
+
+	// funcoes thread de interface
 	{cmd_irl,	"irl","                 informacao registos locais"},
 	{cmd_lr,	"lr","<n> <i>           listar n registos locais a partir de i"},
 	{cmd_er,	"er","                  eliminar registos locais"},
+
+	// funcoes thread de processamento
 	{cmd_cpt,	"cpt","                 consultar periodo de transferencia"},
 	{cmd_mpt,	"mpt","<p>              modificar periodo de transferencia"},
 	{cmd_lar,	"lar","<h> <m> <s>,<h> <m> <s> listar alarmes clk entre t1 e t2"},
@@ -121,8 +125,15 @@ int my_getline (char** argv, int argvsize)
 	static char line[MAX_LINE];
 	char *p;
 	int argc;
+	int i;
 
 	fgets(line, MAX_LINE, stdin);
+
+	for(i = 24; i < NCOMMANDS; i++){
+		if( strstr(line, commands[i].cmd_name) != NULL )
+			argv[0] = strdup(line);
+		return 1;
+	}
 
 	/* Break command line into an o.s. like argument vector,
 	   i.e. compliant with the (int argc, char **argv) specification --------*/
@@ -158,7 +169,7 @@ void monitor (void)
 			/* Executing commands -----------------------------------------------*/
 			if (i < NCOMMANDS){
 				if( i >= 23){
-					//putMSG(, PROCESSING_BOX);
+					putMSG(argv[0], PROCESSING_BOX);
 				}
 				commands[i].cmd_fnct(argc, argv);
 				cyg_thread_yield();

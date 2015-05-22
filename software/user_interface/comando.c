@@ -355,11 +355,11 @@ void cmd_lal (int argc, char **argv)
 {
 	int h1,m1,s1,h2,m2,s2;
 
-	if(argc < 7){
-		if( argc < 4){
-			h1=25;
-			m1=61;
-			s1=61;
+	if(argc < 7){		// no caso de não terem sido passados argumentos suficientes
+		if( argc < 4){	// queremos todos até ao fim, dai substituir pelos valores de limite de t1 e t2
+			h1=0;
+			m1=0;
+			s1=0;
 			h2 = 25;
 			m2 = 61;
 			s2 = 61;
@@ -379,7 +379,7 @@ void cmd_lal (int argc, char **argv)
 		sscanf(argv[5], "%d", m2);
 		sscanf(argv[6], "%d", s2);
 	}
-	
+
 	getLumusAlarms(h1,m1,s1,h2,m2,s2);
 }
 

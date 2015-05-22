@@ -87,7 +87,7 @@ void getRegistersPer(void){
 
 /* send a message to the board. limited to 98 bytes */
 void sendMSGToBoard(char *msg, char size){
-	int i;
+	int i; 
 	if( size > 98){
 		printf("String too big to safely send to board\n");
 	}else{
@@ -102,13 +102,13 @@ void sendMSGToBoard(char *msg, char size){
 		}
 		buffer[size+1] = EOM;
 		
-		i=size+1; // # of unsent bytes
-		while(i != 0)
+		i=size+2; // # of unsent bytes
+		//while(i != 0)
 		{ /* keep trying to send until all bytes are sent */
 			err = cyg_io_write(serH, buffer[size+1 - i], &i);
 		}
 	}
-	return i;
+	//return i;
 }
 
 /* get a message from the board, limited to 98 bytes + SOM and EOM */
@@ -142,15 +142,6 @@ void putMSG(char *buffer, int box){
 	}
 }
 
-/* isto não é equivalente a chamar cyg_mbox_get(box)? talvez um define */
-char *getMSG(int box){
-	if(box == 0){
-		return cyg_mbox_get(mboxH1);
-	}else if(box == 1){
-		return cyg_mbox_get(mboxH2);
-	}
-	return "N"; // isto faz o que?
-}
 
 void interface(cyg_addrword_t data){
 	cmd_ini(0, NULL);
@@ -160,6 +151,9 @@ void interface(cyg_addrword_t data){
 
 void processing(cyg_addrword_t data){
 	char *buffer;
+	int argc;
+	char *p;
+	static char *argv[11];
 
 	forever
 	{
@@ -170,7 +164,15 @@ void processing(cyg_addrword_t data){
 		printf("[PROCESSING] Processing request %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
-		// 
+		for (argc=0,p=buffer; (*buffer != '\0') && (argc < 11); p=NULL,argc++) 
+		{
+			p = strtok(p, " \t\n");
+			argv[argc] = p;
+			if (p == NULL) return argc;
+		}
+		argv[argc] = p;
+
+		
 
 		cyg_thread_yield();
 	}
@@ -186,7 +188,7 @@ void communication_s(cyg_addrword_t data){
 		printf("[COMMUNICATION_R] Sending to board %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
-		sendMSGToBoard(buffer);
+		sendMSGToBoard(buffer, (int) strlen(buffer));
 
 		cyg_thread_yield();
 
