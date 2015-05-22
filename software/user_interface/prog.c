@@ -31,7 +31,7 @@ void getRegistersPer(void){
 		memset(buffer, 0, 6);
 		sprintf(buffer, "trc 5");
 		putMSG(buffer, 1);
-
+// FREES?
 		init_tick = cyg_current_time();
 	}
 	return;
@@ -40,22 +40,45 @@ void getRegistersPer(void){
 
 
 /* send a message to the board. limited to 98 bytes */
-void sendMSGToBoard(char *msg, char size){
-	unsigned int i; 
+void sendMSGToBoard(char *msg){
+	unsigned int i;
+	char size = getSizeOfMSGsend(msg);
+	
 	if( size > 98){
 		printf("String too big to safely send to board\n");
 	}else{
+		cyg_mutex_lock(&lock_write);
 		printf("sending msg to board\n");
-		char buffer[100];
+		cyg_mutex_unlock(&lock_write);
+		
+		unsigned char buffer[100];
 		memset(buffer, 0, 100);
 		
 		buffer[0] = SOM;
 		for(i=0; i< size; i++)
 		{
-			buffer[i+1] = msg [i];
+			buffer[i+1] = (unsigned char)msg [i];
+			cyg_mutex_lock(&lock_write);
+			printf("%x - ", buffer[i+1]);
+
+			unsigned char copia = buffer[i+1];
+			while (copia) {
+			    if (copia & 1)
+			        printf("1");
+			    else
+			        printf("0");
+			
+			    copia >>= 1;
+			}
+			printf("\n");
+
+			cyg_mutex_unlock(&lock_write);
 		}
 		buffer[size+1] = EOM;
-		
+		cyg_mutex_lock(&lock_write);
+		printf("%x\n", buffer[size+1]);
+		cyg_mutex_unlock(&lock_write);
+
 		i=size+2; // # of unsent bytes
 		//while(i != 0)
 		{ /* keep trying to send until all bytes are sent */
@@ -80,18 +103,29 @@ char *getMSGfromBoard(void){
 }
 
 /* get the size of a message, the buffer should include SOM and EOM */
-char getSizeOfMSG(char * msg){
+char getSizeOfMSGrecv(char * msg){
 	int i;
 	//int size;
 	
-	if(msg[0] != SOM)
+	if(msg[0] != (char)SOM)
 		return 0;
 	for(i=1; i<100; i++){
-		if(msg[i] == EOM)
+		if(msg[i] == (char)EOM)
 		return i-1; // SOM and EOM aren't part of the message
 	}
 	return 0;
 }
+
+char getSizeOfMSGsend(unsigned char * msg){
+	char i;
+	for(i = 0; i < 100; i++){
+		if(msg[(int)i] == (unsigned char)MSGEND)
+			return i;
+	}
+	return 0;
+}
+
+
 
 void putMSG(char *buffer, int box){
 	if(box == 0){					// PROCESSING THREAD
@@ -144,10 +178,10 @@ void communication_s(cyg_addrword_t data){
 		buffer = cyg_mbox_get(mboxH2);
 
 		cyg_mutex_lock(&lock_write);
-		printf("[COMMUNICATION_R] Sending to board %s\n", buffer);
+		printf("[COMMUNICATION_S] Sending to board %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
 
-		sendMSGToBoard(buffer, (int) strlen(buffer));
+		sendMSGToBoard(buffer);
 
 		cyg_thread_yield();
 

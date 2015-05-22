@@ -8,9 +8,9 @@
 #include <unistd.h>
 
 #define NR_THREADS 3
-#define PRIORITY_INTERFACE 8
-#define PRIORITY_PROCESSING 8
-#define PRIORITY_COMMUNICATION 8
+#define PRIORITY_INTERFACE 10
+#define PRIORITY_PROCESSING 10
+#define PRIORITY_COMMUNICATION 10
 #define STACKSIZE 4096
 #define MAXLINE 50
 
@@ -52,9 +52,10 @@ cyg_mbox mbox2;
 void setPerTransferencia(char a);
 char getPerTransferencia(void);
 void getRegistersPer(void);
-void sendMSGToBoard(char *msg, char size);
+void sendMSGToBoard(char *msg);
 char *getMSGfromBoard(void);
-char getSizeOfMSG(char * msg);
+char getSizeOfMSGrecv(char * msg);
+char getSizeOfMSGsend(unsigned char * msg);
 void putMSG(char *buffer, int box);
 void interface(cyg_addrword_t data);
 void processing(cyg_addrword_t data);

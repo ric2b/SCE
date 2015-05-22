@@ -76,8 +76,10 @@ int my_getline (char** argv, int argvsize)
 
 	for(i = 24; i < NCOMMANDS; i++){
 		if( strstr(line, commands[i].cmd_name) != NULL )
+		{
 			argv[0] = strdup(line);
-		return 1;
+			return 1;
+		}
 	}
 
 	/* Break command line into an o.s. like argument vector,
@@ -115,8 +117,9 @@ void monitor (void)
 			if (i < NCOMMANDS){
 				if( i >= 23){
 					putMSG(argv[0], PROCESSING_BOX);
+				}else{
+					commands[i].cmd_fnct(argc, argv);
 				}
-				commands[i].cmd_fnct(argc, argv);
 				cyg_thread_yield();
 			}
 			else  

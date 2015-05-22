@@ -27,6 +27,8 @@ cyg_io_handle_t serH;
 #define CMD_OK    0            /* comando realizado com sucesso */
 #define CMD_ERRO  0xFF         /* erro no comando */
 
+#define MSGEND 0xF0
+
 #define COMMUNICATION_THREAD 1
 #define PROCESSING_THREAD 0
 

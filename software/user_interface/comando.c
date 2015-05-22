@@ -13,8 +13,9 @@
 +--------------------------------------------------------------------------*/ 
 void cmd_cr (int argc, char **argv)
 {
-	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", CRLG);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*2);
+	buffer[0] = CRLG;		// can also use %02x
+	buffer[1] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -27,8 +28,17 @@ void cmd_ar (int argc, char **argv)
 		printf("Not enough arguments to cmd ar\n");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*9);
-	sprintf(buffer, "%x %c %c %c", ARLG, argv[1][0], argv[2][0], argv[3][0]);
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*9);
+	buffer[0] = ARLG;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	printf("\n\n%d\n\n", val);
+	buffer[1] = (unsigned char) val;
+	sscanf(argv[2], "%d", &val);
+	buffer[2] = (unsigned char) val;
+	sscanf(argv[3], "%d", &val);
+	buffer[3] = (unsigned char) val;
+	buffer[4] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -37,8 +47,9 @@ void cmd_ar (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_ctl (int argc, char **argv)
 {
-	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", CTEL);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*2);
+	buffer[0] = CTEL;
+	buffer[1] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -47,8 +58,9 @@ void cmd_ctl (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_cp (int argc, char **argv)
 {
-	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", CPAR);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*2);
+	buffer[0] = CPAR;
+	buffer[1] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -62,8 +74,12 @@ void cmd_mpm (int argc, char **argv)
 		printf("Not enough arguments to call mpm\n");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*5);
-	sprintf(buffer, "%x %c", MPMN, argv[1][0]);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*3);
+	buffer[0] = MPMN;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	buffer[1] = (char) val;
+	buffer[2] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -73,8 +89,9 @@ void cmd_mpm (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_ca (int argc, char **argv)
 {
-	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", CALA);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*2);
+	buffer[0] = CALA;
+	buffer[1] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -88,8 +105,16 @@ void cmd_dar (int argc, char **argv)
 		printf("Not enough arguments to call dar\n");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*9);
-	sprintf(buffer, "%x %c %c %c", DALR, argv[1][0], argv[2][0], argv[3][0]);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*5);
+	buffer[0] = DALR;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	buffer[1] = (char) val;
+	sscanf(argv[2], "%d", &val);
+	buffer[2] = val;
+	sscanf(argv[3], "%d", &val);
+	buffer[3] = val;
+	buffer[4] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -103,8 +128,12 @@ void cmd_dat (int argc, char **argv)
 		printf("Not enough arguments to call dat\n");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*4);
-	sprintf(buffer, "%x %c", DALT, argv[1][0]);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*3);
+	buffer[0] = DALT;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	buffer[1] = (char) val;
+	buffer[2] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -118,8 +147,13 @@ void cmd_dal (int argc, char **argv)
 		printf("Not enough arguments to call dal");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*4);
-	sprintf(buffer, "%x %c", DALL, argv[1][0]);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*4);
+	buffer[0] = DALL;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	buffer[1] = (char) val;
+	buffer[2] = MSGEND;
+
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -129,8 +163,9 @@ void cmd_dal (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_aa (int argc, char **argv)
 {
-	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", AALA);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*2);
+	buffer[0] = AALA;
+	buffer[1] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -140,8 +175,9 @@ void cmd_aa (int argc, char **argv)
 +--------------------------------------------------------------------------*/ 
 void cmd_ir (int argc, char **argv)
 {
-	char *buffer = (char*) malloc(sizeof(char)*2);
-	sprintf(buffer, "%x", IREG);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*2);
+	buffer[0] = IREG;
+	buffer[1] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -155,8 +191,12 @@ void cmd_trc (int argc, char **argv)
 		printf("Not enough arguments to call trc\n");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*4);
-	sprintf(buffer, "%x %c", TRGC, argv[1][0]);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*3);
+	buffer[0] = TRGC;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	buffer[1] = (char) val;
+	buffer[2] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -170,8 +210,14 @@ void cmd_tri (int argc, char **argv)
 		printf("Not enough arguments to call tri\n");
 		return;
 	}
-	char *buffer = (char*) malloc(sizeof(char)*6);
-	sprintf(buffer, "%x %c %c", TRGI, argv[1][0], argv[2][0]);		// can also use %02x
+	unsigned char *buffer = (unsigned char*) malloc(sizeof(unsigned char)*4);
+	buffer[0] = TRGI;
+	int val;
+	sscanf(argv[1], "%d", &val);
+	buffer[1] = (char) val;
+	sscanf(argv[2], "%d", &val);
+	buffer[2] = (char) val;
+	buffer[3] = MSGEND;
 	putMSG(buffer, COMMUNICATION_THREAD);
 	return;
 }
@@ -230,7 +276,7 @@ void cmd_cpt (int argc, char **argv)
 {
 	printf("Periodo de transferência: %c", getPerTransferencia());
 	return;
-}
+}	
 
 /*-------------------------------------------------------------------------+
 | Function: cmd_mpt - modificar período de transferência
@@ -417,21 +463,40 @@ void cmd_emh (int argc, char **argv)
 {
   unsigned int n=0, i;
   unsigned char bufw[50];
-
+cyg_mutex_lock(&lock_write);
   if ((n=argc) > 1) {
     n--;
     if (n > 50) n = 50;
     for (i=0; i<n; i++)
       //      sscanf(argv[i+1], "%hhx", &bufw[i]);
-      {unsigned int x; sscanf(argv[i+1], "%x", &x); bufw[i]=(unsigned char)x;}
+    {
+    	unsigned int x; 
+    	sscanf(argv[i+1], "%x", &x);
+    	bufw[i]=(unsigned char)x;
+    }
     err = cyg_io_write(serH, bufw, &n);
+    
     printf("io_write err=%x, n=%d\n", err, n);
     for (i=0; i<n; i++)
+    {
       printf("buf[%d]=%x\n", i, bufw[i]);
+
+		unsigned char copia = bufw[i];
+		while (copia) {
+		    if (copia & 1)
+		        printf("1");
+		    else
+		        printf("0");
+		
+		    copia >>= 1;
+		}
+		printf("\n");
+    }
   }
   else {
     printf("nenhuma mensagem!!!\n");
   }
+cyg_mutex_unlock(&lock_write);
 }
 
 /*-------------------------------------------------------------------------+
@@ -455,11 +520,20 @@ void cmd_rmh (int argc, char **argv)
 {
   unsigned int n=0, i;
   unsigned char bufr[50];
+  
+  printf("io_read err=%x, n=%d\n", err, n);
+  
+  for (i=0; i<n; i++)
+    printf("buf[%d]=%x\n", i, bufr[i]);
+
+  unsigned int n=0, i;
+  unsigned char bufr[50];
 
   if (argc > 1) n = atoi(argv[1]);
   if (n > 50) n = 50;
   err = cyg_io_read(serH, bufr, &n);
   printf("io_read err=%x, n=%d\n", err, n);
+  
   for (i=0; i<n; i++)
     printf("buf[%d]=%x\n", i, bufr[i]);
 }
