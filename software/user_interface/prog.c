@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 #define NR_THREADS 3
-#define PRIORITY_INTERFACE 10
-#define PRIORITY_PROCESSING 10
-#define PRIORITY_COMMUNICATION 10
+#define PRIORITY_INTERFACE 8
+#define PRIORITY_PROCESSING 8
+#define PRIORITY_COMMUNICATION 8
 #define STACKSIZE 4096
 #define MAXLINE 50
 
@@ -30,7 +30,10 @@ cyg_io_handle_t serH;
 extern void cmd_ini (int, char** );
 extern void monitor(void);
 
-char periodo_transferencia;
+char periodo_transferencia; // EM MINUTOS
+
+cyg_tick_count_t init_tick;
+cyg_tick_count_t last_tick;
 
 cyg_thread thread_s[4];
 cyg_handle_t t_interface, t_processing, t_communication_s, t_communication_r;
@@ -50,6 +53,7 @@ cyg_mbox mbox2;
 
 void setPerTransferencia(char a){
 	periodo_transferencia = a;
+	init_tick = cyg_current_time();
 	return;
 }
 
@@ -58,6 +62,28 @@ void setPerTransferencia(char a){
 char getPerTransferencia(void){
 	return periodo_transferencia;
 }
+
+/* transferencia de registos periodicamente */
+
+void getRegistersPer(void){
+	last_tick = cyg_current_time(); // cada tick = 10ms
+	char *buffer;
+
+	if( ((last_tick - init_tick)*10/1000/60) < (int) periodo_transferencia ){
+		// pedir 5 registos
+		// trc 5
+		buffer = (char*) malloc(sizeof(char)*6);
+
+		memset(buffer, 0, 6);
+		sprintf(buffer, "trc 5");
+		putMSG(buffer, 1);
+
+		init_tick = cyg_current_time();
+	}
+	return;
+}
+
+
 
 /* send a message to the board. limited to 98 bytes */
 void sendMSGToBoard(char *msg, char size){
@@ -109,9 +135,9 @@ char getSizeOfMSG(char * msg){
 }
 
 void putMSG(char *buffer, int box){
-	if(box == 0){
+	if(box == 0){					// PROCESSING THREAD
 		cyg_mbox_put(mboxH1, buffer);
-	}else if(box == 1){
+	}else if(box == 1){				// COMMUNICATION THREAD
 		cyg_mbox_put(mboxH2, buffer);
 	}
 }
@@ -137,11 +163,14 @@ void processing(cyg_addrword_t data){
 
 	forever
 	{
+		getRegistersPer();
 		buffer = cyg_mbox_get(mboxH1);
 
 		cyg_mutex_lock(&lock_write);
 		printf("[PROCESSING] Processing request %s\n", buffer);
 		cyg_mutex_unlock(&lock_write);
+
+		// 
 
 		cyg_thread_yield();
 	}

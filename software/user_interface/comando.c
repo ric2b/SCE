@@ -248,6 +248,10 @@ void cmd_er (int argc, char **argv)
 	return;
 }
 
+
+// A PARTIR DAQUI TEM QUE SER PARA POR NA THREAD DE PROCESSAMENTO
+
+
 /*-------------------------------------------------------------------------+
 | Function: cmd_cpt - consultar período de transferência
 +--------------------------------------------------------------------------*/ 
@@ -282,15 +286,30 @@ void cmd_lar (int argc, char **argv)
 	int h1,m1,s1,h2,m2,s2;
 
 	if(argc < 7){
-		printf("Not enough arguments for lar\n");
-		return;
+		if( argc < 4){
+			h1=25;
+			m1=61;
+			s1=61;
+			h2 = 25;
+			m2 = 61;
+			s2 = 61;
+		}else{
+			sscanf(argv[1], "%d", h1);
+			sscanf(argv[2], "%d", m1);
+			sscanf(argv[3], "%d", s1);
+			h2 = 25;
+			m2 = 61;
+			s2 = 61;
+		}
+	}else{
+		sscanf(argv[1], "%d", h1);
+		sscanf(argv[2], "%d", m1);
+		sscanf(argv[3], "%d", s1);
+		sscanf(argv[4], "%d", h2);
+		sscanf(argv[5], "%d", m2);
+		sscanf(argv[6], "%d", s2);
 	}
-	sscanf(argv[1], "%d", h1);
-	sscanf(argv[2], "%d", m1);
-	sscanf(argv[3], "%d", s1);
-	sscanf(argv[4], "%d", h2);
-	sscanf(argv[5], "%d", m2);
-	sscanf(argv[6], "%d", s2);
+
 	getClockAlarms(h1,m1,s1,h2,m2,s2);
 }
 
@@ -302,15 +321,30 @@ void cmd_lat (int argc, char **argv)
 	int h1,m1,s1,h2,m2,s2;
 
 	if(argc < 7){
-		printf("Not enough arguments for lar\n");
-		return;
+		if( argc < 4){
+			h1=25;
+			m1=61;
+			s1=61;
+			h2 = 25;
+			m2 = 61;
+			s2 = 61;
+		}else{
+			sscanf(argv[1], "%d", h1);
+			sscanf(argv[2], "%d", m1);
+			sscanf(argv[3], "%d", s1);
+			h2 = 25;
+			m2 = 61;
+			s2 = 61;
+		}
+	}else{
+		sscanf(argv[1], "%d", h1);
+		sscanf(argv[2], "%d", m1);
+		sscanf(argv[3], "%d", s1);
+		sscanf(argv[4], "%d", h2);
+		sscanf(argv[5], "%d", m2);
+		sscanf(argv[6], "%d", s2);
 	}
-	sscanf(argv[1], "%d", h1);
-	sscanf(argv[2], "%d", m1);
-	sscanf(argv[3], "%d", s1);
-	sscanf(argv[4], "%d", h2);
-	sscanf(argv[5], "%d", m2);
-	sscanf(argv[6], "%d", s2);
+
 	getTempeAlarms(h1,m1,s1,h2,m2,s2);
 }
 
@@ -322,16 +356,31 @@ void cmd_lal (int argc, char **argv)
 	int h1,m1,s1,h2,m2,s2;
 
 	if(argc < 7){
-		printf("Not enough arguments for lar\n");
-		return;
+		if( argc < 4){
+			h1=25;
+			m1=61;
+			s1=61;
+			h2 = 25;
+			m2 = 61;
+			s2 = 61;
+		}else{
+			sscanf(argv[1], "%d", h1);
+			sscanf(argv[2], "%d", m1);
+			sscanf(argv[3], "%d", s1);
+			h2 = 25;
+			m2 = 61;
+			s2 = 61;
+		}
+	}else{
+		sscanf(argv[1], "%d", h1);
+		sscanf(argv[2], "%d", m1);
+		sscanf(argv[3], "%d", s1);
+		sscanf(argv[4], "%d", h2);
+		sscanf(argv[5], "%d", m2);
+		sscanf(argv[6], "%d", s2);
 	}
-	sscanf(argv[1], "%d", h1);
-	sscanf(argv[2], "%d", m1);
-	sscanf(argv[3], "%d", s1);
-	sscanf(argv[4], "%d", h2);
-	sscanf(argv[5], "%d", m2);
-	sscanf(argv[6], "%d", s2);
-	getTempeAlarms(h1,m1,s1,h2,m2,s2);
+	
+	getLumusAlarms(h1,m1,s1,h2,m2,s2);
 }
 
 /*-------------------------------------------------------------------------+

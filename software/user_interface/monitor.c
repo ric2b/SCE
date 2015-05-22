@@ -14,38 +14,43 @@
 /*-------------------------------------------------------------------------+
   | Headers of command functions
   +--------------------------------------------------------------------------*/ 
-extern void cmd_sair (int, char** );
-extern void cmd_ini (int, char** );
-extern void cmd_ems (int, char** );
-extern void cmd_emh (int, char** );
-extern void cmd_rms (int, char** );
-extern void cmd_rmh (int, char** );
-extern void cmd_test (int, char** );
-extern void cmd_cr (int, char** );
-extern void cmd_ar (int, char** );
-extern void cmd_ctl (int, char** );
-extern void cmd_cp (int, char** );
-extern void cmd_mpm (int, char** );
-extern void cmd_ca (int, char** );
-extern void cmd_dar (int, char** );
-extern void cmd_dat (int, char** );
-extern void cmd_dal (int, char** );
-extern void cmd_aa (int, char** );
-extern void cmd_ir (int, char** );
-extern void cmd_trc (int, char** );
-extern void cmd_tri (int, char** );
-extern void cmd_irl (int, char** );
-extern void cmd_lr (int, char** );
-extern void cmd_er (int, char** );
-extern void cmd_cpt (int, char** );
-extern void cmd_mpt (int, char** );
-extern void cmd_lar (int, char** );
-extern void cmd_lat (int, char** );
-extern void cmd_lal (int, char** );
-extern void cmd_iga (int, char** );
-extern void cmd_ig (int, char** );
+extern void cmd_sair (int, char** );		// 0
+extern void cmd_ini (int, char** );			// 1
+extern void cmd_ems (int, char** );			// 2
+extern void cmd_emh (int, char** );			// 3
+extern void cmd_rms (int, char** );			// 4
+extern void cmd_rmh (int, char** );			// 5
+extern void cmd_test (int, char** );		// 6
+extern void cmd_cr (int, char** );			// 7
+extern void cmd_ar (int, char** );			// 8
+extern void cmd_ctl (int, char** );			// 9
+extern void cmd_cp (int, char** );			// 10
+extern void cmd_mpm (int, char** );			// 11
+extern void cmd_ca (int, char** );			// 12
+extern void cmd_dar (int, char** );			// 13
+extern void cmd_dat (int, char** );			// 14
+extern void cmd_dal (int, char** );			// 15
+extern void cmd_aa (int, char** );			// 16
+extern void cmd_ir (int, char** );			// 17
+extern void cmd_trc (int, char** );			// 18
+extern void cmd_tri (int, char** );			// 19
+extern void cmd_irl (int, char** );			// 20
+extern void cmd_lr (int, char** );			// 21
+extern void cmd_er (int, char** );			// 22
+extern void cmd_cpt (int, char** );			// 23
+extern void cmd_mpt (int, char** );			// 24
+extern void cmd_lar (int, char** );			// 25
+extern void cmd_lat (int, char** );			// 26
+extern void cmd_lal (int, char** );			// 27
+extern void cmd_iga (int, char** );			// 28
+extern void cmd_ig (int, char** );			// 29
 void cmd_sos  (int, char** );
+
+
 extern char *getMSG(int box);
+extern void putMSG(char *buffer, int box);
+#define PROCESSING_BOX 0
+
 /*-------------------------------------------------------------------------+
   | Variable and constants definition
   +--------------------------------------------------------------------------*/ 
@@ -152,7 +157,10 @@ void monitor (void)
 					break;
 			/* Executing commands -----------------------------------------------*/
 			if (i < NCOMMANDS){
-				commands[i].cmd_fnct (argc, argv);
+				if( i >= 23){
+					//putMSG(, PROCESSING_BOX);
+				}
+				commands[i].cmd_fnct(argc, argv);
 				cyg_thread_yield();
 			}
 			else  
