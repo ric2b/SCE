@@ -1,25 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <cyg/kernel/kapi.h>
-
-#define NRBUF 150
-#define CLOCK_ALARM 7
-#define TEMPE_ALARM 8
-#define LUMUS_ALARM 9
-#define MONIT_ALARM 6
-
-typedef struct _circularbuf_{
-	char data[NRBUF][8];
-}circularbuf;
-
-unsigned char wPointer=0;
-unsigned char rPointer=0;
-unsigned char regWritten=0;
-
-circularbuf shared_mem;
-
-cyg_mutex_t lock_circularbuf;
+#include "memory.h"
+#include "comando.h"
+#include "prog.h"
+#include "monitor.h"
 
 // initiates the lock for circular buff
 

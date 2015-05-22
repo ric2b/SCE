@@ -18,6 +18,7 @@ LDFLAGS       = -nostartfiles -L$(INSTALL_DIR)/lib -Ttarget.ld
 
 #####
 OBJS= prog.o monitor.o comando.o memory.o
+DEFS= comando.h prog.h monitor.h memory.h
 
 # RULES
 
@@ -29,16 +30,16 @@ clean:
 	-rm -f cmd $(OBJS)
 
 %.o: %.c
-	$(XCC) -c -o $*.o $(CFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+	$(XCC) -c -o $*.o $(DEFS) $(CFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
 %.o: %.cxx
-	$(XCXX) -c -o $*.o $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+	$(XCXX) -c -o $*.o $(DEFS) $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
 %.o: %.C
-	$(XCXX) -c -o $*.o $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+	$(XCXX) -c -o $*.o $(DEFS) $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
 %.o: %.cc
-	$(XCXX) -c -o $*.o $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
+	$(XCXX) -c -o $*.o $(DEFS) $(CXXFLAGS) $(ECOS_GLOBAL_CFLAGS) $<
 
 cmd: $(OBJS)
 	$(XLD) $(LDFLAGS) $(ECOS_GLOBAL_LDFLAGS) -o $@ $(OBJS)

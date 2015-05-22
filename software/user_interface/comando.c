@@ -4,39 +4,10 @@
 | Autor: Carlos Almeida (IST)
 | Data:  Maio 2008
 ***************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <cyg/io/io.h>
-
-Cyg_ErrNo err;
-cyg_io_handle_t serH;
-
-#define SOM   0xFD  /* inicio mensagem */
-#define EOM   0xFE  /* fim mensagem */
-#define CRLG  0xC0  /* consultar relogio */
-#define ARLG  0xC1  /* acertar relogio */
-#define CTEL  0xC2  /* consultar temperatura e luminosidade */
-#define CPAR  0xC3  /* consultar parametros */
-#define MPMN  0xC4  /* modificar periodo monitorizacao */
-#define CALA  0xC5  /* consultar alarmes */
-#define DALR  0xC6  /* definir alarme relogio */
-#define DALT  0xC7  /* definir alarme temperatura */
-#define DALL  0xC8  /* definir alarme luminosidade */
-#define AALA  0xC9  /* activar/desactivar alarmes */
-#define IREG  0xCA  /* informacao sobre registos */
-#define TRGC  0xCB  /* transferir registos a partir da posicao corrente */
-#define TRGI  0xCC  /* transferir registos a partir do indice especificado */
-#define NMCH  0xCD  /* notificacao memoria cheia */
-#define CMD_OK    0            /* comando realizado com sucesso */
-#define CMD_ERRO  0xFF         /* erro no comando */
-
-#define COMMUNICATION_THREAD 1
-#define PROCESSING_THREAD 0
-
-extern void putMSG(char *buffer, int box); // Communication thread -> box == 1
-extern void setPerTransferencia(char a);
-extern char char getPerTransferencia(void);
-
+#include "memory.h"
+#include "comando.h"
+#include "prog.h"
+#include "monitor.h"
 /*-------------------------------------------------------------------------+
 | Function: cmd_cr - Consultar relogio
 +--------------------------------------------------------------------------*/ 
