@@ -60,7 +60,7 @@ void cmd_test (int argc, char** argv);
 void cmd_ems (int argc, char **argv);
 void cmd_emh (int argc, char **argv);
 void cmd_rms (int argc, char **argv);
-void cmd_rmh (int argc, char **argv);
+char* cmd_rmh (int a);
 void cmd_ini(int argc, char **argv);
 
 #endif

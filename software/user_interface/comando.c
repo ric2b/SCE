@@ -463,7 +463,7 @@ void cmd_emh (int argc, char **argv)
 {
   unsigned int n=0, i;
   unsigned char bufw[50];
-cyg_mutex_lock(&lock_write);
+  cyg_mutex_lock(&lock_write);
   if ((n=argc) > 1) {
     n--;
     if (n > 50) n = 50;
@@ -496,7 +496,7 @@ cyg_mutex_lock(&lock_write);
   else {
     printf("nenhuma mensagem!!!\n");
   }
-cyg_mutex_unlock(&lock_write);
+  cyg_mutex_unlock(&lock_write);
 }
 
 /*-------------------------------------------------------------------------+
@@ -516,26 +516,20 @@ void cmd_rms (int argc, char **argv)
 /*-------------------------------------------------------------------------+
 | Function: cmd_rmh - receber mensagem (hexadecimal)
 +--------------------------------------------------------------------------*/ 
-void cmd_rmh (int argc, char **argv)
+char* cmd_rmh (int a)
 {
   unsigned int n=0, i;
-  unsigned char bufr[50];
-  
-  printf("io_read err=%x, n=%d\n", err, n);
-  
-  for (i=0; i<n; i++)
-    printf("buf[%d]=%x\n", i, bufr[i]);
+  unsigned char *bufr = (unsigned char*) malloc(sizeof(unsigned char)*50);
 
-  unsigned int n=0, i;
-  unsigned char bufr[50];
-
-  if (argc > 1) n = atoi(argv[1]);
-  if (n > 50) n = 50;
+  if (a > 50) n = 50;
+  else n = a;
   err = cyg_io_read(serH, bufr, &n);
   printf("io_read err=%x, n=%d\n", err, n);
   
   for (i=0; i<n; i++)
     printf("buf[%d]=%x\n", i, bufr[i]);
+
+  return bufr;
 }
 
 

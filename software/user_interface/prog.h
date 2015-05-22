@@ -14,7 +14,7 @@
 #define STACKSIZE 4096
 #define MAXLINE 50
 
-#define NR_COMMANDS (sizeof(commands)/sizeof(struct command_d))
+#define NR_COMMANDS (sizeof(commandx)/sizeof(struct command_d))
 
 #define NAME_PROCESSING "thread processing"
 #define NAME_INTERFACE "thread interface"
